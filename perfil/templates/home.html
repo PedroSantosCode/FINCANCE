@@ -1,168 +1,555 @@
 {% extends 'bases/base.html' %}
 {% load static %}
- {% block 'head' %}
-    
-    <link href="{% static 'perfil/css/home.css' %}" rel="stylesheet">
 
+{% block 'page_title' %}Dashboard{% endblock %}
+{% block 'page_subtitle' %}Visão geral das suas finanças{% endblock %}
+
+{% block 'head' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .stat-card {
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Spending gauge */
+    .gauge-ring {
+        transform: rotate(-90deg);
+        transform-origin: center;
+    }
+
+    .gauge-ring circle {
+        transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Decorative gradient orb */
+    .card-orb {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.03;
+        pointer-events: none;
+    }
+
+    /* Account row animation */
+    .account-row {
+        transition: all 0.2s ease;
+    }
+
+    .account-row:hover {
+        background: rgba(255, 255, 255, 0.04);
+        transform: translateX(4px);
+    }
+
+    /* Credit card visual */
+    .credit-card {
+        background: linear-gradient(135deg, #1E293B 0%, #0F172A 50%, #111827 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .credit-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.06) 0%, transparent 60%);
+    }
+
+    .credit-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.2), transparent);
+    }
+</style>
 {% endblock %}
 
 {% block 'body' %}
-    <div class="container">
-        <br>
-        <br>
-        <div class="row">
-            <div class="col-md-3">
-                <a style="text-decoration: none; color:white;" href="{% url 'novo_valor' %}">
-                    <div class="card">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <span  class="fonte-destaque">R$ {{total_entradas}}</span>
-                            </div>
-                            <div class="col-md">
-                                <img class="icone-setas" src="{% static 'perfil/img/entradas.png' %}">
-                            </div>
+<div class="max-w-[1440px] mx-auto">
 
-
-                            
-                        </div>
-        
-                    </div>
-                </a>
+    <!-- Budget Alerts -->
+    {% if categorias_alerta %}
+    <div class="mb-6 space-y-2">
+        {% for alerta in categorias_alerta %}
+        <div class="glass-card px-5 py-3.5 flex items-center justify-between border-l-4 border-red-500"
+            style="animation: slideUp 0.3s ease-out {{ forloop.counter0 }}00ms both;">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                </div>
+                <span class="text-sm font-medium text-red-400">{{ alerta.nome }}</span>
             </div>
-            <div class="col-md-3">
-                <a style="text-decoration: none; color:white;" href="{% url 'novo_valor' %}">
-                    <div class="card">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <span  class="fonte-destaque">R$ {{total_saidas}}</span>
-                            </div>
-                            <div class="col-md">
-                                <img class="icone-setas" src="{% static 'perfil/img/saidas.png' %}">
-                            </div>
-                        </div> 
-                    </div>
-                </a>
-            </div>
+            <span class="text-xs text-slate-500 dark:text-slate-400">
+                R$ {{ alerta.gasto|floatformat:2 }} / R$ {{ alerta.limite|floatformat:2 }}
+                <span class="text-red-400/70 ml-1 font-medium">(+R$ {{ alerta.excesso|floatformat:2 }})</span>
+            </span>
         </div>
-        <br>
-        <br>
-       
-        <div class="row">
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="saldo">
-                        <span class="fonte-destaque">Saldo total</span>
-                        <br>
-                        <span class="font-light">R$ {{total_contas}}</span>
-                    </div>
-                    <hr class="hr-borda">
-                    <span class="fonte-destaque">Suas contas</span>
-
-                    <div class="div-contas">
-                        {% for conta in contas %}
-                            <div class="lista-conta">
-                                <span>{{conta.apelido}}</span>
-                                <span class="total-conta">{{conta.valor}}</span>
-                            </div>
-                            <br>
-                        
-                        {% endfor %}
-                        
-                    </div>
-                    <hr class="hr-borda">
-                    <a href="{% url 'gerenciar' %}" class="botao-principal">Gerenciar contas</a>
-                </div>
-                
-            </div>
-
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="saldo">
-                                <span class="fonte-destaque">Saldo mensal</span>
-                                <br>
-                                <span class="font-light">R$ 0.000,00</span>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="despesa">
-                                <span class="fonte-destaque">Despesa mensal</span>
-                                <br>
-                                <span class="font-light">R$ 0.000,00</span>
-                            </div>
-
-                        </div>
-
-                    </div>
-                    <hr class="hr-borda">
-                    <span class="fonte-destaque">Total livre</span>
-                    <span class="font-light negativo">R$ 0.000,00</span>
-                    <hr class="hr-borda">
-                    <a href="#" class="botao-principal">Gerenciar dados mensais</a>
-                </div>
-            </div>
-
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="saldo">
-                        <span class="fonte-destaque">Planejamento</span>
-                    </div>
-                    <hr class="hr-borda">
-                    <a href="{% url 'definir_planejamento' %}" class="botao-principal">Definir planejamento</a>
-                    <hr>
-                     <a href="{% url 'ver_planejamento' %}" class="botao-principal">Ver planejamento</a>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="card">
-                    <span class="fonte-destaque">Equilibrio financeiro</span>
-                    <hr class="hr-borda">
-
-                    <p>Gastos essenciais</p>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: {{percentual_gastos_essenciais}}%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <br>
-                    <p>Gastos não essenciais</p>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: {{percentual_gastos_nao_essenciais}}%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-
-                    <hr class="hr-borda">
-                    <a href="{% url 'gerenciar' %}" class="botao-principal">Alterar categorias essenciais</a>
-
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-md-4">
-            </div>
-            
-            <div class="col-md-8">
-                <div class="card">
-                    <span class="fonte-destaque">Gerenciar contas</span>
-                    <hr class="hr-borda">
-
-                    <span class="fonte-destaque">Próximas do vencimento</span>
-                    <span class="fonte-light">3 contas próximas do vencimento</span>
-                    <br>
-                    <span class="fonte-destaque negativo">Vencidas</span>
-                    <span class="fonte-light">0 contas vencidas</span>
-
-                    <hr class="hr-borda">
-                    
-                    <a href="{% url 'ver_contas' %}" class="botao-principal">Ver mais</a>
-
-                </div>
-            </div>
-        </div>
-        <br>
-        <br>
+        {% endfor %}
     </div>
+    {% endif %}
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Grid: 12 cols -->
+    <div class="grid grid-cols-12 gap-5 lg:gap-6 mb-6">
+
+        <!-- Balance + Chart Area (col-span-8) -->
+        <div class="col-span-12 lg:col-span-8">
+            <div class="glass-card p-6 lg:p-7 hover-lift relative">
+                <div class="card-orb top-0 right-0" style="background: #22C55E;"></div>
+                <!-- Balance header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.15em] mb-2">Saldo Total
+                        </p>
+                        <p class="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white font-display tracking-tight"
+                            data-balance="total_contas">R$
+                            {{total_contas|floatformat:"2"}}
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="text-[11px] text-slate-500 bg-white/[0.04] px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/[0.04] font-medium">Mensal</span>
+                    </div>
+                </div>
+                <!-- Interactive Chart area -->
+                <div class="relative h-52 mb-5 rounded-xl overflow-hidden border border-slate-200 dark:border-white/[0.04]"
+                    style="background: rgba(15,23,42,0.5);">
+                    <canvas id="homeChart" class="w-full h-full"></canvas>
+                </div>
+                <!-- Quick stats row -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="rounded-xl p-4 border border-slate-200 dark:border-white/[0.04] relative overflow-hidden"
+                        style="background: rgba(34,197,94,0.03);">
+                        <div
+                            class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent">
+                        </div>
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                            <span
+                                class="text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold">Entradas</span>
+                        </div>
+                        <p class="text-xl font-bold text-emerald-400 neon-text" data-balance="total_entradas">R$
+                            {{total_entradas|floatformat:"2"}}
+                        </p>
+                    </div>
+                    <div class="rounded-xl p-4 border border-slate-200 dark:border-white/[0.04] relative overflow-hidden"
+                        style="background: rgba(239,68,68,0.03);">
+                        <div
+                            class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-500/30 to-transparent">
+                        </div>
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                            <span
+                                class="text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold">Saídas</span>
+                        </div>
+                        <p class="text-xl font-bold text-red-400" data-balance="total_saidas">R$
+                            {{total_saidas|floatformat:"2"}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spending Summary (col-span-4) -->
+        <div class="col-span-12 lg:col-span-4">
+            <div class="glass-card p-6 h-full hover-lift">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Resumo de Gastos</h3>
+                    <a href="{% url 'dashboard' %}"
+                        class="p-1.5 rounded-lg hover:bg-white/[0.04] transition-colors text-[10px] text-emerald-400 font-medium">
+                        Ver mais →
+                    </a>
+                </div>
+                <!-- Circular gauge -->
+                <div class="flex justify-center mb-6">
+                    <div class="relative w-40 h-40">
+                        <svg class="w-full h-full gauge-ring" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.03)"
+                                stroke-width="7" />
+                            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#gaugeGradient)" stroke-width="7"
+                                stroke-dasharray="264" stroke-dashoffset="{{ percentual_gastos_essenciais|default:60 }}"
+                                stroke-linecap="round" />
+                            <defs>
+                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#22C55E" />
+                                    <stop offset="100%" stop-color="#14B8A6" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold mb-1">Gasto</p>
+                            <p class="text-lg font-bold text-slate-900 dark:text-white" data-balance="total_saidas">R$
+                                {{total_saidas|floatformat:"2"}}</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Category breakdown -->
+                <div class="space-y-3.5 pt-4 border-t border-slate-200 dark:border-white/[0.04]">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Essenciais</span>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-900 dark:text-white">{{percentual_gastos_essenciais}}%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Não Essenciais</span>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-900 dark:text-white">{{percentual_gastos_nao_essenciais}}%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-cyan-400"></div>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Investimentos</span>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-900 dark:text-white">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row: Your Accounts + User Profiles + Quick Actions -->
+    <div class="grid grid-cols-12 gap-5 lg:gap-6 mb-6">
+
+        <!-- Your Card (like reference) -->
+        <div class="col-span-12 lg:col-span-4">
+            <div class="glass-card p-6 hover-lift">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Suas Contas</h3>
+                    <span
+                        class="text-[10px] text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-lg font-medium">{{contas|length}}
+                        contas</span>
+                </div>
+                <!-- Decorative credit card visual -->
+                <div class="credit-card rounded-2xl p-5 mb-5 border border-slate-200 dark:border-white/[0.06]">
+                    <div class="absolute top-3 right-4 opacity-[0.06]">
+                        <img src="/media/icones/logo.png" class="h-8 w-auto" alt="">
+                    </div>
+                    <p
+                        class="text-[10px] text-slate-500 uppercase tracking-[0.15em] mb-1.5 font-semibold relative z-10">
+                        Total em Contas</p>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white mb-5 relative z-10 font-display"
+                        data-balance="total_contas">R$
+                        {{total_contas|floatformat:"2"}}</p>
+                    <div class="flex items-center justify-between text-[10px] text-slate-500 relative z-10">
+                        <span class="font-medium">FINANCE.BANK</span>
+                        <span
+                            class="badge-shimmer px-2 py-0.5 rounded-full text-emerald-400 font-semibold">Premium</span>
+                    </div>
+                </div>
+                <!-- Account list -->
+                <div class="space-y-1 max-h-48 overflow-y-auto pr-1">
+                    {% for conta in contas %}
+                    <div class="account-row flex items-center justify-between py-2.5 px-3 rounded-lg cursor-default">
+                        <div class="flex items-center gap-3">
+                            <img src="{{conta.icone.url}}"
+                                class="w-8 h-8 rounded-full object-cover ring-1 ring-white/[0.08]" alt="">
+                            <span class="text-sm text-slate-700 dark:text-slate-300">{{conta.apelido}}</span>
+                        </div>
+                        <span class="text-sm font-semibold text-emerald-400">R$ {{conta.valor|floatformat:"2"}}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profiles (renamed from Contas Bancárias) -->
+        <div class="col-span-12 lg:col-span-4">
+            <div class="glass-card p-6 hover-lift">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Perfis de Usuários</h3>
+                    <a href="{% url 'gerenciar' %}"
+                        class="text-[11px] text-emerald-500 hover:text-emerald-400 font-medium transition-colors">Ver
+                        tudo</a>
+                </div>
+                <div class="space-y-0.5">
+                    {% for conta in contas|slice:":7" %}
+                    <div class="account-row flex items-center justify-between py-2.5 px-2 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <img src="{{conta.icone.url}}"
+                                class="w-9 h-9 rounded-full object-cover ring-1 ring-white/[0.08]" alt="">
+                            <div>
+                                <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">{{conta.apelido}}</p>
+                                <p class="text-[11px] text-slate-500">{{conta.get_banco_display}}</p>
+                            </div>
+                        </div>
+                        <span
+                            class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/10">Ativa</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-span-12 lg:col-span-4">
+            <div class="glass-card p-6 hover-lift">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Ações Rápidas</h3>
+                </div>
+                <!-- Action avatars row -->
+                <div class="flex items-center gap-1.5 mb-5">
+                    {% for conta in contas|slice:":5" %}
+                    <img src="{{conta.icone.url}}"
+                        class="w-10 h-10 rounded-full object-cover ring-2 ring-primary hover:ring-emerald-500/30 transition-all cursor-pointer hover:scale-110"
+                        alt="">
+                    {% endfor %}
+                    <a href="{% url 'gerenciar' %}"
+                        class="w-10 h-10 rounded-full bg-white/[0.04] border border-dashed border-slate-200 dark:border-white/[0.15] flex items-center justify-center hover:border-emerald-500/30 transition-colors cursor-pointer">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </a>
+                </div>
+                <!-- Action buttons -->
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <a href="{% url 'novo_valor' %}" class="btn-gradient text-xs py-2.5 block font-semibold">Novo
+                        Valor</a>
+                    <a href="{% url 'gerenciar' %}"
+                        class="bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 text-xs py-2.5 rounded-xl text-center hover:bg-white/[0.08] hover:border-emerald-500/10 transition-all block font-medium">Gerenciar</a>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <a href="{% url 'calculadora' %}"
+                        class="bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 text-xs py-2.5 rounded-xl text-center hover:bg-white/[0.08] hover:border-cyan-500/10 transition-all block font-medium">
+                        🧮 Calculadora</a>
+                    <a href="{% url 'view_extrato' %}"
+                        class="bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 text-xs py-2.5 rounded-xl text-center hover:bg-white/[0.08] hover:border-cyan-500/10 transition-all block font-medium">
+                        📊 Extrato</a>
+                </div>
+                <!-- Financial balance bars -->
+                <div class="space-y-4 pt-5 border-t border-slate-200 dark:border-white/[0.04]">
+                    <h4 class="text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold">Equilíbrio
+                        Financeiro</h4>
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Gastos Essenciais</span>
+                            <span
+                                class="text-xs font-semibold text-emerald-400">{{percentual_gastos_essenciais}}%</span>
+                        </div>
+                        <div class="w-full bg-white/[0.04] rounded-full h-1.5">
+                            <div class="bg-gradient-to-r from-emerald-500 to-emerald-400 h-1.5 rounded-full transition-all duration-1000 relative"
+                                style="width: {{percentual_gastos_essenciais}}%">
+                                <div
+                                    class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-500/30">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Gastos Não Essenciais</span>
+                            <span
+                                class="text-xs font-semibold text-red-400">{{percentual_gastos_nao_essenciais}}%</span>
+                        </div>
+                        <div class="w-full bg-white/[0.04] rounded-full h-1.5">
+                            <div class="bg-gradient-to-r from-red-500 to-red-400 h-1.5 rounded-full transition-all duration-1000 relative"
+                                style="width: {{percentual_gastos_nao_essenciais}}%">
+                                <div
+                                    class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-red-400 shadow-lg shadow-red-500/30">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Row: Planning + Bills -->
+    <div class="grid grid-cols-12 gap-5 lg:gap-6">
+        <!-- Planning card -->
+        <div class="col-span-12 lg:col-span-6">
+            <div class="glass-card p-6 hover-lift">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Planejamento & Metas</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="{% url 'definir_planejamento' %}"
+                        class="bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 text-xs py-3.5 rounded-xl text-center hover:bg-white/[0.08] hover:border-cyan-500/10 transition-all block font-medium">Definir
+                        Planejamento</a>
+                    <a href="{% url 'ver_planejamento' %}" class="btn-gradient text-xs py-3.5 block font-semibold">Ver
+                        Planejamento</a>
+                    <a href="{% url 'metas' %}" class="btn-gradient text-xs py-3.5 block font-semibold">Metas
+                        Financeiras</a>
+                    <a href="{% url 'dashboard' %}"
+                        class="bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 text-xs py-3.5 rounded-xl text-center hover:bg-white/[0.08] hover:border-cyan-500/10 transition-all block font-medium">Analytics</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bills -->
+        <div class="col-span-12 lg:col-span-6">
+            <div class="glass-card p-6 hover-lift">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Contas a Pagar</h3>
+                    </div>
+                    <a href="{% url 'ver_contas' %}"
+                        class="text-[11px] text-emerald-500 hover:text-emerald-400 font-medium transition-colors">Ver
+                        tudo</a>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-5">
+                    <div class="rounded-xl p-4 border border-slate-200 dark:border-white/[0.04] text-center relative overflow-hidden"
+                        style="background: rgba(251,191,36,0.03);">
+                        <div
+                            class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent">
+                        </div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-[0.15em] mb-1.5 font-semibold">Próximas
+                        </p>
+                        <p class="text-2xl font-bold text-amber-400 font-display">3</p>
+                    </div>
+                    <div class="rounded-xl p-4 border border-slate-200 dark:border-white/[0.04] text-center relative overflow-hidden"
+                        style="background: rgba(239,68,68,0.03);">
+                        <div
+                            class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-500/30 to-transparent">
+                        </div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-[0.15em] mb-1.5 font-semibold">Vencidas
+                        </p>
+                        <p class="text-2xl font-bold text-red-400 font-display">0</p>
+                    </div>
+                </div>
+                <a href="{% url 'ver_contas' %}" class="btn-gradient text-xs py-3 w-full block font-semibold">Ver
+                    Detalhes</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Home page interactive chart with real data
+    const ctx = document.getElementById('homeChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels| safe }},
+        datasets: [{
+            label: 'Entradas (R$)',
+            data: {{ chart_entradas| safe }},
+        borderColor: '#22C55E',
+        backgroundColor: (context) => {
+            const chart = context.chart;
+            const { ctx: c, chartArea } = chart;
+            if (!chartArea) return 'rgba(34, 197, 94, 0.06)';
+            const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.15)');
+            gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+            return gradient;
+        },
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#22C55E',
+        pointBorderColor: '#0B1120',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        borderWidth: 2.5,
+            }, {
+            label: 'Saídas (R$)',
+            data: {{ chart_saidas| safe }},
+        borderColor: '#EF4444',
+        backgroundColor: (context) => {
+            const chart = context.chart;
+            const { ctx: c, chartArea } = chart;
+            if (!chartArea) return 'rgba(239, 68, 68, 0.06)';
+            const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.1)');
+            gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            return gradient;
+        },
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#EF4444',
+        pointBorderColor: '#0B1120',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        borderWidth: 2.5,
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        plugins: {
+            legend: {
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    padding: 15,
+                    boxHeight: 6,
+                    color: 'rgba(148, 163, 184, 0.6)',
+                    font: { size: 10 }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                borderColor: 'rgba(255,255,255,0.06)',
+                borderWidth: 1,
+                titleFont: { weight: '600', size: 12 },
+                bodyFont: { size: 11 },
+                padding: 14,
+                cornerRadius: 10,
+                displayColors: true,
+                callbacks: {
+                    label: function (context) {
+                        return context.dataset.label + ' R$ ' + context.parsed.y.toFixed(2);
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.02)', drawBorder: false },
+                ticks: { padding: 8, color: 'rgba(148,163,184,0.5)', font: { size: 10 } }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { padding: 8, color: 'rgba(148,163,184,0.5)', font: { size: 10 } }
+            }
+        }
+    }
+    });
+</script>
 {% endblock %}

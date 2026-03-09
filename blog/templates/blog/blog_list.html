@@ -1,0 +1,89 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+
+{% block 'title' %}Blog - Finance.Bank{% endblock %}
+{% block 'page_title' %}Blog{% endblock %}
+{% block 'page_subtitle' %}Notícias e artigos sobre finanças{% endblock %}
+
+{% block 'head' %}
+<style>
+    .blog-card {
+        transition: all .35s ease;
+    }
+
+    .blog-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+    }
+
+    .blog-card img {
+        transition: transform .5s ease;
+    }
+
+    .blog-card:hover img {
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}
+
+{% block 'body' %}
+<div class="max-w-[1440px] mx-auto">
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white font-display">Blog & Notícias</h2>
+            <p class="text-sm text-slate-500 mt-1">Últimos artigos sobre planejamento financeiro</p>
+        </div>
+        {% if user.is_authenticated %}
+        <a href="{% url 'blog_create' %}" class="btn-gradient text-sm py-2.5 px-6">+ Novo Post</a>
+        {% endif %}
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for post in posts %}
+        <a href="{% url 'blog_detail' post.slug %}" class="blog-card glass-card overflow-hidden block group">
+            {% if post.image %}
+            <div class="h-48 overflow-hidden">
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+            </div>
+            {% else %}
+            <div class="h-48 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 flex items-center justify-center">
+                <svg class="w-16 h-16 text-emerald-500/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+            </div>
+            {% endif %}
+            <div class="p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <span
+                        class="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full uppercase tracking-wider">{{ post.get_category_display }}</span>
+                    <span class="text-[10px] text-slate-600">{{ post.created_at|date:"d/m/Y" }}</span>
+                </div>
+                <h3 class="text-slate-900 dark:text-white font-semibold mb-2 group-hover:text-emerald-400 transition-colors">{{ post.title }}</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{{ post.summary }}</p>
+            </div>
+        </a>
+        {% empty %}
+        <div class="col-span-full glass-card p-12 text-center">
+            <svg class="w-16 h-16 text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+            </svg>
+            <h3 class="text-slate-900 dark:text-white font-semibold mb-2">Nenhum post publicado ainda</h3>
+            <p class="text-sm text-slate-500 mb-6">Os artigos aparecerão aqui em breve.</p>
+            {% if user.is_authenticated %}
+            <a href="{% url 'blog_create' %}" class="btn-gradient text-sm py-2.5 px-8">Criar Primeiro Post</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

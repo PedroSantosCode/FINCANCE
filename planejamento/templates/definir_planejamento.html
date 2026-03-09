@@ -1,68 +1,117 @@
 {% extends 'bases/base.html' %}
 {% load static %}
+
+{% block 'page_title' %}Definir Planejamento{% endblock %}
+{% block 'page_subtitle' %}Configure valores de planejamento por categoria{% endblock %}
+
 {% block 'head' %}
+<style>
+    .plan-row {
+        transition: all 0.2s ease;
+    }
 
-    <link href="{% static 'perfil/css/home.css' %}" rel="stylesheet">
-    <link href="{% static 'perfil/css/gerenciar.css' %}" rel="stylesheet">
-    <link href="{% static 'extrato/css/view_extrato.css' %}" rel="stylesheet">
+    .plan-row:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
 
+    .save-btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .save-btn.saved {
+        background: rgba(34, 197, 94, 0.15) !important;
+        color: #34D399 !important;
+    }
+</style>
 {% endblock %}
 
 {% block 'body' %}
+<div class="max-w-4xl mx-auto">
 
-    <div class="container">
-        <br>
-        <br>
-        <p class="fonte-destaque">Definir planejamento</p>
-        <div class="card">
-        
-            <table>
-                <tr>
-                    <th>Categoria</th>
-                    <th>Valor</th>
-                    <th>Ação</th>
-                </tr>
-
-                {% for categoria in categorias %}
-                    <tr class="linha">
-                        <td>{{categoria}}</td>
-                        <td><input type="text" id='valor-categoria-{{categoria.id}}' class="form-control" value="{{categoria.valor_planejamento}}"></td>
-                        <td><button onclick="update_valor_planejamento_categoria({{categoria.id}})" style="width: 100%;" class="botao-secundario">Salvar</button></td>         
-                    </tr>
-                {% endfor %}
-                
-
-            </table>
-        
-
+    <div class="glass-card overflow-hidden hover-lift relative">
+        <div
+            class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent">
         </div>
+
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-slate-200 dark:border-white/[0.04] flex items-center justify-between"
+            style="background: rgba(15,23,42,0.3);">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                    <svg class="w-4.5 h-4.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Planejamento por Categoria</h3>
+                    <p class="text-[10px] text-slate-500">Defina limites de gasto mensais</p>
+                </div>
+            </div>
+            <a href="{% url 'ver_planejamento' %}"
+                class="text-[11px] text-emerald-500 hover:text-emerald-400 font-medium transition-colors">Ver progresso
+                →</a>
+        </div>
+
+        <!-- Table header -->
+        <div class="grid grid-cols-12 gap-4 px-6 py-3 text-[10px] font-semibold text-slate-500 uppercase tracking-[0.15em] border-b border-slate-200 dark:border-white/[0.04]"
+            style="background: rgba(15,23,42,0.5);">
+            <div class="col-span-5">Categoria</div>
+            <div class="col-span-4">Valor Planejado (R$)</div>
+            <div class="col-span-3">Ação</div>
+        </div>
+        <!-- Category rows -->
+        {% for categoria in categorias %}
+        <div class="plan-row grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-slate-200 dark:border-white/[0.03]"
+            style="animation: slideUp 0.3s ease-out {{ forloop.counter0 }}50ms both;">
+            <div class="col-span-5">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-2.5 h-2.5 rounded-full {% if categoria.essencial %}bg-emerald-500{% else %}bg-red-500{% endif %}">
+                    </div>
+                    <div>
+                        <span class="text-sm text-slate-800 dark:text-slate-200 font-medium">{{categoria}}</span>
+                        <p class="text-[10px] text-slate-600">{% if categoria.essencial %}Essencial{% else %}Não
+                            essencial{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-4">
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-medium">R$</span>
+                    <input type="text" id="valor-categoria-{{categoria.id}}" class="form-input text-sm pl-9"
+                        value="{{categoria.valor_planejamento}}">
+                </div>
+            </div>
+            <div class="col-span-3">
+                <button onclick="update_valor_planejamento_categoria({{categoria.id}}, this)"
+                    class="save-btn btn-gradient w-full text-[11px] py-2.5 font-semibold">Salvar</button>
+            </div>
+        </div>
+        {% endfor %}
     </div>
+</div>
 
-    <script>
+<script>
+    function update_valor_planejamento_categoria(id, btn) {
+        valor = document.getElementById('valor-categoria-' + id).value;
 
-        function update_valor_planejamento_categoria(id){
-            valor = document.getElementById('valor-categoria-'+id).value
-            console.log(valor)
-
-             fetch("/planejamento/update_valor_categoria/"+id, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    
-                },
-                body: JSON.stringify({novo_valor: valor})
-                
-            }).then(function(result){
-                return result.json()
-
-            }).then(function(data){
-                console.log(data)
-
-            })
-
-        }
-
+        fetch("/planejamento/update_valor_categoria/" + id + "/", {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ novo_valor: valor })
+        }).then(function (result) {
+            return result.json();
+        }).then(function (data) {
+            // Show quick success feedback
+            btn.classList.add('saved');
+            btn.textContent = '✓ Salvo';
+            setTimeout(() => {
+                btn.classList.remove('saved');
+                btn.textContent = 'Salvar';
+            }, 1500);
+        });
+    }
 </script>
-
-
 {% endblock %}

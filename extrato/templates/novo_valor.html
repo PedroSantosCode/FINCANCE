@@ -1,76 +1,238 @@
 {% extends 'bases/base.html' %}
 {% load static %}
+
+{% block 'page_title' %}Novo Valor{% endblock %}
+{% block 'page_subtitle' %}Registrar entradas e saídas{% endblock %}
+
 {% block 'head' %}
+<style>
+    .ia-badge {
+        display: none;
+        background: linear-gradient(135deg, #22C55E, #14B8A6);
+        color: #0B1120;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: 8px;
+        animation: fadeInBadge 0.4s ease-out;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+    }
 
-    <link href="{% static 'perfil/css/home.css' %}" rel="stylesheet">
-    <link href="{% static 'perfil/css/gerenciar.css' %}" rel="stylesheet">
+    .ia-badge.show {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
 
+    @keyframes fadeInBadge {
+        from {
+            opacity: 0;
+            transform: translateY(-5px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .type-btn {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .type-btn.selected-entrada {
+        border-color: rgba(34, 197, 94, 0.5) !important;
+        background: rgba(34, 197, 94, 0.06) !important;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.08);
+    }
+
+    .type-btn.selected-saida {
+        border-color: rgba(239, 68, 68, 0.5) !important;
+        background: rgba(239, 68, 68, 0.06) !important;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.08);
+    }
+
+    .form-section {
+        position: relative;
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, rgba(34, 197, 94, 0.2) 0%, transparent 100%);
+        border-radius: 1px;
+    }
+</style>
 {% endblock %}
 
 {% block 'body' %}
+<div class="max-w-3xl mx-auto">
 
-    <div class="container">
-        <br>
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        <br>
-        <span class="fonte-destaque">Adicionar entradas/saídas</span>
-        <div class="row">
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-            <div class="col-md-7">
-                <form action="{% url 'novo_valor' %}" method="POST">{% csrf_token %}
-                    <div class="row">
-                        <div class="col-md">
-                            <label>Valor</label>
-                            <input name="valor" type="text" class="form-control">
-                        </div>
+    <div class="glass-card p-8 lg:p-10 hover-lift relative">
+        <div class="absolute top-0 right-0 w-64 h-64 rounded-full opacity-[0.02] pointer-events-none"
+            style="background: radial-gradient(circle, #22C55E, transparent 70%);"></div>
 
-                        <div class="col-md">
-                            <label>Categoria</label>
-                            <select name="categoria" class="form-select">
-                                {% for categoria in categorias %}
-                                    <option value="{{categoria.id}}">{{categoria}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <br>
-                    <label>Descrição</label>
-                    <textarea name="descricao" class="form-control"></textarea>
-                    <br>
-                    <div class="row">
-                        <div class="col-md">
-                            <label>Data</label>  
-                            <input name="data" type="date" class="form-control">
-                        </div>
-
-                        <div class="col-md">
-                            <label>Conta</label>
-                            <select name="conta" class="form-select">
-                                {% for conta in contas %}
-                                    <option value="{{conta.id}}">{{conta}}</option>
-                                {% endfor %}    
-                            </select>
-                        </div>
-                    </div>
-                    <br>
-                    <input type="radio" name="tipo" value="E"> <label class="positivo">Entrada</label>
-                    <input type="radio" name="tipo" value="S"> <label class="negativo">Saída</label>
-                    <br>
-                    <br>
-                    <input type="submit" style="width:40%;" class="botao-principal">
-
-                </form>
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
             </div>
-
-            <div class="col-md-8">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white font-display">Adicionar Entrada / Saída</h3>
+                <p class="text-xs text-slate-500">Registre suas movimentações financeiras</p>
             </div>
-
         </div>
 
+        <form action="{% url 'novo_valor' %}" method="POST">{% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                <div>
+                    <label class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Valor
+                        (R$)</label>
+                    <div class="relative">
+                        <span
+                            class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-medium">R$</span>
+                        <input name="valor" type="text" class="form-input pl-10" placeholder="0.00">
+                    </div>
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Categoria</label>
+                    <select name="categoria" id="categoriaSelect" class="form-input">
+                        {% for categoria in categorias %}
+                        <option value="{{categoria.id}}">{{categoria}}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="ia-badge" id="iaBadge">
+                        <span>🤖</span> <span id="iaTexto">IA sugeriu</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label
+                    class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Descrição</label>
+                <textarea name="descricao" id="descricaoInput" class="form-input min-h-[90px] resize-none"
+                    placeholder="Ex: Uber para o trabalho, Mercado semanal..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                <div>
+                    <label
+                        class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Data</label>
+                    <input name="data" type="date" class="form-input">
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Conta</label>
+                    <select name="conta" class="form-input">
+                        {% for conta in contas %}
+                        <option value="{{conta.id}}">{{conta}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tipo radio buttons -->
+            <div class="mb-8">
+                <label
+                    class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-3">Tipo</label>
+                <div class="flex gap-3">
+                    <div class="flex-1">
+                        <input type="radio" name="tipo" value="E" id="tipoE" class="hidden">
+                        <label for="tipoE" id="labelE"
+                            class="type-btn block text-center py-3.5 rounded-xl border border-slate-200 dark:border-white/[0.06] text-sm font-semibold text-emerald-400 cursor-pointer hover:bg-emerald-500/[0.04] transition-all">
+                            <span class="flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                                </svg>
+                                Entrada
+                            </span>
+                        </label>
+                    </div>
+                    <div class="flex-1">
+                        <input type="radio" name="tipo" value="S" id="tipoS" class="hidden">
+                        <label for="tipoS" id="labelS"
+                            class="type-btn block text-center py-3.5 rounded-xl border border-slate-200 dark:border-white/[0.06] text-sm font-semibold text-red-400 cursor-pointer hover:bg-red-500/[0.04] transition-all">
+                            <span class="flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                                </svg>
+                                Saída
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-gradient w-full py-4 text-sm font-bold tracking-wide">Registrar
+                Transação</button>
+        </form>
     </div>
+</div>
+
+<script>
+    // Type button styling
+    const tipoE = document.getElementById('tipoE');
+    const tipoS = document.getElementById('tipoS');
+    const labelE = document.getElementById('labelE');
+    const labelS = document.getElementById('labelS');
+
+    tipoE.addEventListener('change', function () {
+        labelE.classList.add('selected-entrada');
+        labelS.classList.remove('selected-saida');
+    });
+
+    tipoS.addEventListener('change', function () {
+        labelS.classList.add('selected-saida');
+        labelE.classList.remove('selected-entrada');
+    });
+
+    // IA suggestion
+    let debounceTimer;
+    const descricaoInput = document.getElementById('descricaoInput');
+    const categoriaSelect = document.getElementById('categoriaSelect');
+    const iaBadge = document.getElementById('iaBadge');
+    const iaTexto = document.getElementById('iaTexto');
+
+    descricaoInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        const descricao = this.value.trim();
+        if (descricao.length < 3) { iaBadge.classList.remove('show'); return; }
+        debounceTimer = setTimeout(function () {
+            fetch('/perfil/api/sugerir_categoria/?descricao=' + encodeURIComponent(descricao))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.encontrado) {
+                        categoriaSelect.value = data.categoria_id;
+                        iaTexto.textContent = 'IA: ' + data.categoria_nome + ' (' + data.confianca + '%)';
+                        iaBadge.classList.remove('show');
+                        void iaBadge.offsetWidth;
+                        iaBadge.classList.add('show');
+                    } else { iaBadge.classList.remove('show'); }
+                })
+                .catch(() => { iaBadge.classList.remove('show'); });
+        }, 400);
+    });
+</script>
 
 {% endblock %}

@@ -1,17 +1,123 @@
+# =============================================================
+# FINANCE.BANK — .gitignore
+# =============================================================
+
+# ---------------------------------------------------------------
 # Python
-venv/
+# ---------------------------------------------------------------
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
 
+# ---------------------------------------------------------------
+# Virtual Environments
+# ---------------------------------------------------------------
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ---------------------------------------------------------------
 # Django
-db.sqlite3
+# ---------------------------------------------------------------
 *.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
 
-# Node
-node_modules/
+# Arquivos de migração gerados (manter os iniciais é opcional)
+# Descomente as linhas abaixo se quiser ignorar todas as migrações
+# */migrations/*.py
+# !*/migrations/__init__.py
 
-# IDE
-.idea/
-
-# Environment variables
+# ---------------------------------------------------------------
+# Secrets e Variáveis de Ambiente (CRÍTICO)
+# ---------------------------------------------------------------
 .env
+.env.*
+.envrc
+secrets.json
+secret_key.txt
+*.secret
+config/local.py
+
+# ---------------------------------------------------------------
+# Arquivos de Mídia / Uploads de Usuários
+# ---------------------------------------------------------------
+# Os uploads ficam em /media — não versionar arquivos de usuário,
+# apenas manter a estrutura de diretórios (via .gitkeep)
+media/*
+!media/.gitkeep
+
+# ---------------------------------------------------------------
+# Arquivos Estáticos Coletados
+# ---------------------------------------------------------------
+# Gerados por `collectstatic`, não devem ir para o repositório
+staticfiles/
+static/
+!templates/static/
+
+# ---------------------------------------------------------------
+# Node.js (Tailwind CLI, etc.)
+# ---------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ---------------------------------------------------------------
+# IDEs e Editores
+# ---------------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------------------------------
+# Pytest / Coverage
+# ---------------------------------------------------------------
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+
+# ---------------------------------------------------------------
+# Build / Distribuição
+# ---------------------------------------------------------------
+dist/
+build/
+*.egg-info/
+*.egg
+MANIFEST
+
+# ---------------------------------------------------------------
+# Mypy / Type Checkers
+# ---------------------------------------------------------------
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# ---------------------------------------------------------------
+# Jupyter Notebooks
+# ---------------------------------------------------------------
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------
+# Arquivos Temporários e Sistema
+# ---------------------------------------------------------------
+*.tmp
+*.bak
+*.orig
+*.pid

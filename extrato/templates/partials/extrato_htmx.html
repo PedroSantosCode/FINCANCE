@@ -1,0 +1,126 @@
+        <!-- Summary cards -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="glass-card p-4 text-center relative overflow-hidden">
+                <div
+                    class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent">
+                </div>
+                <p class="text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-1">Entradas</p>
+                <p class="text-lg font-bold text-emerald-400 font-display">R$ {{ total_entradas|floatformat:"2" }}</p>
+            </div>
+            <div class="glass-card p-4 text-center relative overflow-hidden">
+                <div
+                    class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-500/30 to-transparent">
+                </div>
+                <p class="text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-1">Saídas</p>
+                <p class="text-lg font-bold text-red-400 font-display">R$ {{ total_saidas|floatformat:"2" }}</p>
+            </div>
+            <div class="glass-card p-4 text-center relative overflow-hidden">
+                <div
+                    class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent">
+                </div>
+                <p class="text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-1">Saldo</p>
+                <p
+                    class="text-lg font-bold {% if saldo >= 0 %}text-emerald-400{% else %}text-red-400{% endif %} font-display">
+                    R$ {{ saldo|floatformat:"2" }}</p>
+            </div>
+        </div>
+
+        {% if busca %}
+        <div class="mb-4">
+            <span class="text-xs text-slate-500">Resultados para: <span class="text-emerald-400 font-medium">"{{ busca
+                    }}"</span></span>
+        </div>
+        {% endif %}
+
+        <!-- Transaction list -->
+        <div class="glass-card overflow-hidden">
+            <!-- Table header -->
+            <div class="grid grid-cols-12 gap-4 px-6 py-3.5 text-[10px] font-semibold text-slate-500 uppercase tracking-[0.15em] border-b border-slate-200 dark:border-white/[0.04]"
+                style="background: rgba(15,23,42,0.5);">
+                <div class="col-span-3">Conta</div>
+                <div class="col-span-2">Categoria</div>
+                <div class="col-span-2">Data</div>
+                <div class="col-span-2">Tipo</div>
+                <div class="col-span-1 text-center">Recibo</div>
+                <div class="col-span-2 text-right">Valor</div>
+            </div>
+            <!-- Transaction rows -->
+            {% for valor in valores %}
+            <div class="tx-row grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-slate-200 dark:border-white/[0.03]"
+                style="animation: slideUp 0.3s ease-out {{ forloop.counter0 }}30ms both;">
+                <div class="col-span-3">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="tx-avatar w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 {% if valor.tipo == 'S' %}bg-red-500/10{% else %}bg-emerald-500/10{% endif %}">
+                            {% if valor.tipo == 'S' %}
+                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                            </svg>
+                            {% else %}
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="text-sm text-slate-800 dark:text-slate-200 font-medium">{{valor.conta}}</span>
+                            <p class="text-[10px] text-slate-500 truncate max-w-[120px]">{{valor.descricao}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <span class="text-sm text-slate-500 dark:text-slate-400">{{valor.categoria}}</span>
+                </div>
+                <div class="col-span-2">
+                    <span class="text-sm text-slate-500">{{valor.data}}</span>
+                </div>
+                <div class="col-span-2">
+                    {% if valor.tipo == 'S' %}
+                    <span
+                        class="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/10">Saída</span>
+                    {% else %}
+                    <span
+                        class="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/10">Entrada</span>
+                    {% endif %}
+                </div>
+                <div class="col-span-1 flex justify-center">
+                    {% if valor.comprovante %}
+                    <a href="{{ valor.comprovante.url }}" target="_blank"
+                        class="p-1.5 text-slate-500 hover:text-emerald-500 bg-white/[0.04] hover:bg-emerald-500/10 rounded-lg transition-colors border border-transparent hover:border-emerald-500/20"
+                        title="Ver Comprovante">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
+                            </path>
+                        </svg>
+                    </a>
+                    {% else %}
+                    <span class="text-[10px] text-slate-600">-</span>
+                    {% endif %}
+                </div>
+                <div class="col-span-2 text-right">
+                    {% if valor.tipo == 'S' %}
+                    <span class="text-sm font-semibold text-red-400">- R$ {{valor.valor|floatformat:"2"}}</span>
+                    {% else %}
+                    <span class="text-sm font-semibold text-emerald-400 neon-text">+ R$
+                        {{valor.valor|floatformat:"2"}}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="px-6 py-16 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-white/[0.03] mx-auto mb-4 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <p class="text-sm text-slate-500 font-medium">Nenhuma transação encontrada</p>
+                <p class="text-xs text-slate-600 mt-1">Tente ajustar os filtros acima</p>
+                <a href="{% url 'novo_valor' %}"
+                    class="btn-gradient text-xs py-2.5 px-6 inline-block mt-4 font-semibold">Adicionar Transação</a>
+            </div>
+            {% endfor %}
+        </div>

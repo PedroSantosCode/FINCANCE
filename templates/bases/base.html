@@ -1,22 +1,934 @@
 {% load static %}
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="{% static 'geral/css/base.css' %}" rel="stylesheet">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FINANCE.BANK - Premium Wealth Management Platform">
+  <link rel="icon" type="image/png" href="/media/icones/mediaimages/logo.png">
+  <title>{% block 'title' %}FINANCE.BANK{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0B1120',
+            surface: '#111827',
+            'surface-light': '#1E293B',
+            card: 'rgba(30, 41, 59, 0.7)',
+            neon: '#22C55E',
+            'neon-dim': 'rgba(34, 197, 94, 0.15)',
+            emerald: { 400: '#34D399', 500: '#22C55E', 600: '#16A34A' },
+            cyan: { 400: '#22D3EE', 500: '#06B6D4' },
+            teal: { 400: '#2DD4BF', 500: '#14B8A6' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Manrope', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          backdropBlur: { xs: '2px' },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'fade-in': 'fadeIn 0.5s ease-out',
+            'slide-up': 'slideUp 0.4s ease-out',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    <title>{% block 'title' %}{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    {% block 'head' %}{% endblock %}
-  
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #201F1F;">
-        <a class="navbar-brand" style="margin-left: 30px" href="{% url 'home' %}">FINANCE.BANK</a>
-    </nav>
-    {% block 'body' %}{% endblock %}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+    body {
+      background-color: #0B1120;
+      color: #E2E8F0;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0B1120;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    .nav-link {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: rgba(34, 197, 94, 0.06);
+      border-left-color: #22C55E;
+      color: #22C55E;
+    }
+
+    .nav-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 24px;
+      background: #22C55E;
+      border-radius: 0 4px 4px 0;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+    }
+
+    .glass-card {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    }
+
+    .btn-gradient {
+      background: linear-gradient(135deg, #22C55E, #14B8A6);
+      color: #0B1120;
+      font-weight: 700;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.625rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-gradient::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-gradient:hover::before {
+      left: 100%;
+    }
+
+    .btn-gradient:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3), 0 0 40px rgba(34, 197, 94, 0.1);
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #E2E8F0;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .form-input:focus {
+      border-color: rgba(34, 197, 94, 0.4);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.08), 0 0 20px rgba(34, 197, 94, 0.05);
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .form-input::placeholder {
+      color: #475569;
+    }
+
+    .form-input option {
+      background: #111827;
+      color: #E2E8F0;
+    }
+
+    .alert-success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      color: #34D399;
+    }
+
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #F87171;
+    }
+
+    .alert-warning {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      color: #FBBF24;
+    }
+
+    .alert-info {
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      color: #22D3EE;
+    }
+
+    .alert-primary {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      color: #818CF8;
+    }
+
+    [class*="alert-"] {
+      padding: 0.875rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      backdrop-filter: blur(12px);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .hover-lift {
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(34, 197, 94, 0.03);
+    }
+
+    .neon-glow {
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.15), 0 0 30px rgba(34, 197, 94, 0.05);
+    }
+
+    .neon-text {
+      text-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+    }
+
+    .ambient-glow {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.1), 0 0 20px rgba(34, 197, 94, 0.05);
+      }
+
+      to {
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.2), 0 0 40px rgba(34, 197, 94, 0.1);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      backdrop-filter: blur(0px);
+      z-index: 40;
+      pointer-events: none;
+      transition: background 0.35s ease, backdrop-filter 0.35s ease;
+    }
+
+    .sidebar-overlay.show {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      pointer-events: auto;
+    }
+
+    @media (max-width: 1023px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+    }
+
+    /* Desktop sidebar collapse */
+    @media (min-width: 1024px) {
+      .sidebar {
+        transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+          opacity 0.25s ease;
+      }
+
+      .sidebar.collapsed {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+
+      .main-wrapper {
+        transition: margin-left 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .main-wrapper.expanded {
+        margin-left: 0 !important;
+      }
+    }
+
+    /* Sidebar toggle button */
+    .sidebar-toggle-btn {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #64748b;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(34, 197, 94, 0.15);
+      color: #22C55E;
+    }
+
+    .sidebar-toggle-btn .toggle-bar {
+      position: absolute;
+      width: 16px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar-toggle-btn .toggle-bar:nth-child(1) {
+      transform: translateY(-5px);
+    }
+
+    .sidebar-toggle-btn .toggle-bar:nth-child(2) {
+      transform: translateY(0);
+    }
+
+    .sidebar-toggle-btn .toggle-bar:nth-child(3) {
+      transform: translateY(5px);
+    }
+
+    .sidebar-toggle-btn.collapsed .toggle-bar:nth-child(1) {
+      transform: translateY(0) rotate(45deg);
+      width: 18px;
+    }
+
+    .sidebar-toggle-btn.collapsed .toggle-bar:nth-child(2) {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+
+    .sidebar-toggle-btn.collapsed .toggle-bar:nth-child(3) {
+      transform: translateY(0) rotate(-45deg);
+      width: 18px;
+    }
+
+    .status-dot {
+      position: relative;
+    }
+
+    .status-dot::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      background: inherit;
+      opacity: 0;
+      animation: pulse 2s ease-out infinite;
+    }
+
+    .page-content {
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .badge-shimmer {
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.2) 50%, rgba(34, 197, 94, 0.1) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+  </style>
+  {% block 'head' %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex">
+  <div class="ambient-glow w-[600px] h-[600px] rounded-full top-[-200px] left-[-200px] opacity-[0.03]"
+    style="background: radial-gradient(circle, #22C55E, transparent 70%);"></div>
+  <div class="ambient-glow w-[400px] h-[400px] rounded-full bottom-[-100px] right-[-100px] opacity-[0.02]"
+    style="background: radial-gradient(circle, #06B6D4, transparent 70%);"></div>
+  <div id="sidebarOverlay" class="sidebar-overlay lg:hidden" onclick="toggleSidebar()"></div>
+  <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-[260px] z-50 flex flex-col lg:translate-x-0"
+    style="background: linear-gradient(180deg, rgba(17, 24, 39, 0.98) 0%, rgba(11, 17, 32, 0.99) 100%); border-right: 1px solid rgba(255,255,255,0.04);">
+    <div class="relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10 bg-cover bg-center"
+        style="background-image: url('/media/icones/mediaimages/bg.png');"></div>
+      <div class="absolute inset-0"
+        style="background: linear-gradient(180deg, rgba(17,24,39,0.5) 0%, rgba(17,24,39,1) 100%);"></div>
+      <div class="relative px-5 py-7 flex items-center gap-3">
+        <div class="relative">
+          <img src="/media/icones/mediaimages/logo.png" alt="FINANCE.BANK" class="h-9 w-auto relative z-10">
+          <div class="absolute inset-0 blur-xl opacity-30 bg-emerald-500 rounded-full"></div>
+        </div>
+        <div>
+          <span class="text-base font-bold text-white font-display tracking-tight">Finance</span>
+          <span class="text-base font-bold text-emerald-500 font-display neon-text">.Bank</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex-1 px-3 py-5 overflow-y-auto">
+      <p class="px-3 mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">Geral</p>
+      <nav class="space-y-0.5">
+        <a href="{% url 'home' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Dashboard
+        </a>
+        <a href="{% url 'view_extrato' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Extrato
+        </a>
+        <a href="{% url 'novo_valor' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Novo Valor
+        </a>
+        <a href="{% url 'definir_contas' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+          Contas
+        </a>
+      </nav>
+      <p class="px-3 mt-7 mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">Planejamento</p>
+      <nav class="space-y-0.5">
+        <a href="{% url 'ver_planejamento' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+          Planejamento
+        </a>
+        <a href="{% url 'metas' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Metas
+        </a>
+        <a href="{% url 'dashboard' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+          </svg>
+          Analytics
+        </a>
+      </nav>
+      <p class="px-3 mt-7 mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">Sistema</p>
+      <nav class="space-y-0.5">
+        <a href="{% url 'gerenciar' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Gerenciar
+        </a>
+        <a href="{% url 'ver_contas' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Contas a Pagar
+        </a>
+        <a href="{% url 'calculadora' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          Calculadora
+        </a>
+        <a href="{% url 'blog_list' %}"
+          class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+          </svg>
+          Blog
+        </a>
+      </nav>
+    </div>
+    <div class="p-4 border-t border-white/[0.04]">
+      <div class="relative rounded-xl overflow-hidden p-4 text-center"
+        style="background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(6,182,212,0.05));">
+        <div class="absolute inset-0 border border-emerald-500/10 rounded-xl"></div>
+        <div class="relative">
+          <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <p class="text-xs font-semibold text-white mb-0.5">Finance Manager</p>
+          <p class="text-[10px] text-slate-500 mb-3">Gerencie seus gastos com inteligência</p>
+          <a href="{% url 'dashboard' %}" class="btn-gradient text-[11px] py-2 px-5 block rounded-lg">Ver Analytics</a>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div id="mainWrapper" class="main-wrapper flex-1 lg:ml-[260px] min-h-screen flex flex-col relative z-10">
+    <header class="sticky top-0 z-30 border-b border-white/[0.04]"
+      style="background: rgba(11, 17, 32, 0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);">
+      <div class="flex items-center justify-between px-6 lg:px-8 h-[64px]">
+        <div class="flex items-center gap-4">
+          <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <button onclick="toggleDesktopSidebar()" id="desktopToggleBtn" class="hidden lg:flex sidebar-toggle-btn"
+            title="Ocultar menu">
+            <span class="toggle-bar"></span>
+            <span class="toggle-bar"></span>
+            <span class="toggle-bar"></span>
+          </button>
+          <div>
+            <h1 class="text-sm font-semibold text-white font-display">
+              {% block 'page_title' %}Dashboard{% endblock %}
+            </h1>
+            <p class="text-[11px] text-slate-500 mt-0.5">
+              {% block 'page_subtitle' %}Gerencie suas financas{% endblock %}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Search bar -->
+          <form action="{% url 'view_extrato' %}" method="GET" id="searchForm"
+            class="hidden md:flex items-center bg-white/[0.04] rounded-xl px-3.5 py-2 gap-2 border border-white/[0.04] focus-within:border-emerald-500/20 transition-colors">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" name="busca" placeholder="Buscar transações..."
+              class="bg-transparent text-xs text-slate-300 placeholder-slate-600 outline-none w-36">
+          </form>
+
+          <!-- Notification bell -->
+          <div class="relative">
+            <button id="notifBtn" onclick="togglePanel('notifPanel')"
+              class="relative p-2 text-slate-500 hover:text-slate-300 transition-colors rounded-xl hover:bg-white/[0.03]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span id="notifDot"
+                class="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-primary"></span>
+            </button>
+            <!-- Notification dropdown panel -->
+            <div id="notifPanel"
+              class="hidden absolute right-0 top-full mt-2 w-80 rounded-xl border border-white/[0.06] shadow-2xl shadow-black/50 z-50 overflow-hidden"
+              style="background: rgba(17, 24, 39, 0.97); backdrop-filter: blur(20px);">
+              <div class="px-4 py-3 border-b border-white/[0.04] flex items-center justify-between">
+                <h4 class="text-sm font-semibold text-white font-display">Notificações</h4>
+                <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full font-semibold"
+                  id="notifCount">0</span>
+              </div>
+              <div id="notifList" class="max-h-72 overflow-y-auto">
+                <div class="px-4 py-8 text-center">
+                  <svg class="w-8 h-8 text-slate-700 mx-auto mb-2" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  <p class="text-xs text-slate-500">Carregando notificações...</p>
+                </div>
+              </div>
+              <div class="px-4 py-2.5 border-t border-white/[0.04]">
+                <a href="{% url 'view_extrato' %}"
+                  class="text-[11px] text-emerald-500 hover:text-emerald-400 font-medium transition-colors block text-center">Ver
+                  todas as transações →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- User avatar dropdown -->
+          <div class="relative">
+            <button id="userBtn" onclick="togglePanel('userPanel')"
+              class="flex items-center gap-2.5 pl-2 border-l border-white/[0.06] cursor-pointer hover:opacity-80 transition-opacity">
+              <img src="/media/icones/1.png" class="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-500/20"
+                alt="User">
+              <div class="hidden sm:block text-left">
+                <p class="text-xs font-medium text-slate-300">{{ user.username|default:"Admin" }}</p>
+                <p class="text-[10px] text-slate-600">Premium</p>
+              </div>
+              <svg class="w-3.5 h-3.5 text-slate-500 hidden sm:block" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <!-- User profile dropdown -->
+            <div id="userPanel"
+              class="hidden absolute right-0 top-full mt-2 w-64 rounded-xl border border-white/[0.06] shadow-2xl shadow-black/50 z-50 overflow-hidden"
+              style="background: rgba(17, 24, 39, 0.97); backdrop-filter: blur(20px);">
+              <div class="px-4 py-4 border-b border-white/[0.04]">
+                <div class="flex items-center gap-3">
+                  <img src="/media/icones/1.png" class="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/20"
+                    alt="User">
+                  <div>
+                    <p class="text-sm font-semibold text-white">{{ user.username|default:"Admin" }}</p>
+                    <p class="text-[10px] text-slate-500">{{ user.email|default:"admin@finance.bank" }}</p>
+                  </div>
+                </div>
+                <div class="mt-3 flex gap-2">
+                  <span
+                    class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full font-semibold border border-emerald-500/10">Premium</span>
+                  <span
+                    class="text-[10px] text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-full font-semibold border border-cyan-500/10">Ativo</span>
+                </div>
+              </div>
+              <div class="py-1.5">
+                <a href="{% url 'home' %}"
+                  class="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Dashboard
+                </a>
+                <a href="{% url 'gerenciar' %}"
+                  class="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Gerenciar Perfis
+                </a>
+                <a href="{% url 'dashboard' %}"
+                  class="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                  </svg>
+                  Analytics
+                </a>
+                <a href="{% url 'calculadora' %}"
+                  class="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  Calculadora
+                </a>
+              </div>
+              <div class="px-4 py-3 border-t border-white/[0.04]">
+                <a href="{% url 'auth_logout' %}"
+                  class="flex items-center gap-3 text-xs text-red-400 hover:text-red-300 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sair
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="flex-1 p-6 lg:p-8 page-content">{% block 'body' %}{% endblock %}</main>
+    <footer class="border-t border-white/[0.04] px-6 lg:px-8 py-4">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <img src="/media/icones/mediaimages/logo.png" alt="FINANCE.BANK" class="h-4 w-auto opacity-30">
+          <span class="text-[11px] text-slate-600">&copy; 2026 FINANCE.BANK</span>
+        </div>
+        <span class="text-[11px] text-slate-700">Gerenciador de Gastos Inteligente</span>
+      </div>
+    </footer>
+  </div>
+  <script>
+    // Mobile sidebar toggle
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('show');
+    }
+
+    // Desktop sidebar toggle with localStorage persistence
+    function toggleDesktopSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const main = document.getElementById('mainWrapper');
+      const btn = document.getElementById('desktopToggleBtn');
+      const isCollapsed = sidebar.classList.toggle('collapsed');
+      main.classList.toggle('expanded', isCollapsed);
+      btn.classList.toggle('collapsed', isCollapsed);
+      btn.title = isCollapsed ? 'Mostrar menu' : 'Ocultar menu';
+      localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+    // Restore sidebar state on load
+    (function () {
+      if (localStorage.getItem('sidebarCollapsed') === 'true') {
+        document.getElementById('sidebar').classList.add('collapsed');
+        document.getElementById('mainWrapper').classList.add('expanded');
+        const btn = document.getElementById('desktopToggleBtn');
+        if (btn) {
+          btn.classList.add('collapsed');
+          btn.title = 'Mostrar menu';
+        }
+      }
+    })();
+
+    // Active nav link
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.nav-link').forEach(link => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('active');
+      }
+    });
+
+    // Intersection observer for glass cards
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.glass-card').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(12px)';
+      card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(card);
+    });
+
+    // Panel toggle system
+    function togglePanel(panelId) {
+      const panel = document.getElementById(panelId);
+      const isHidden = panel.classList.contains('hidden');
+      // Close all panels first
+      document.querySelectorAll('#notifPanel, #userPanel').forEach(p => p.classList.add('hidden'));
+      // Toggle the clicked one
+      if (isHidden) {
+        panel.classList.remove('hidden');
+        panel.style.animation = 'slideUp 0.2s ease-out';
+        // Load notifications if opening notif panel
+        if (panelId === 'notifPanel') loadNotifications();
+      }
+    }
+
+    // Close panels when clicking outside
+    document.addEventListener('click', function (e) {
+      const notifBtn = document.getElementById('notifBtn');
+      const notifPanel = document.getElementById('notifPanel');
+      const userBtn = document.getElementById('userBtn');
+      const userPanel = document.getElementById('userPanel');
+
+      if (notifPanel && !notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
+        notifPanel.classList.add('hidden');
+      }
+      if (userPanel && !userPanel.contains(e.target) && !userBtn.contains(e.target)) {
+        userPanel.classList.add('hidden');
+      }
+    });
+
+    // Load notifications via API
+    function loadNotifications() {
+      fetch('/perfil/api/resumo/')
+        .then(r => r.json())
+        .then(data => {
+          const list = document.getElementById('notifList');
+          const count = document.getElementById('notifCount');
+          const dot = document.getElementById('notifDot');
+          let html = '';
+          let total = 0;
+
+          // Budget alerts
+          if (data.alertas && data.alertas.length > 0) {
+            data.alertas.forEach(a => {
+              total++;
+              html += `
+                <div class="px-4 py-3 border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs text-red-400 font-medium">Orçamento: ${a.nome}</p>
+                      <p class="text-[10px] text-slate-500 mt-0.5">R$ ${a.gasto.toFixed(2)} / R$ ${a.limite.toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>`;
+            });
+          }
+
+          // Recent transactions
+          if (data.ultimas_transacoes && data.ultimas_transacoes.length > 0) {
+            data.ultimas_transacoes.forEach(t => {
+              total++;
+              const isEntrada = t.tipo === 'E';
+              const icon = isEntrada
+                ? '<svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/></svg>'
+                : '<svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"/></svg>';
+              const color = isEntrada ? 'emerald' : 'red';
+              const sign = isEntrada ? '+' : '-';
+              html += `
+                <div class="px-4 py-3 border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-7 h-7 rounded-lg bg-${color}-500/10 flex items-center justify-center flex-shrink-0">${icon}</div>
+                      <div>
+                        <p class="text-xs text-slate-300 font-medium">${t.descricao.substring(0, 25)}${t.descricao.length > 25 ? '...' : ''}</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">${t.data} · ${t.categoria}</p>
+                      </div>
+                    </div>
+                    <span class="text-xs font-semibold text-${color}-400">${sign}R$ ${t.valor.toFixed(2)}</span>
+                  </div>
+                </div>`;
+            });
+          }
+
+          // Recent bill payments
+          if (data.pagamentos_recentes && data.pagamentos_recentes.length > 0) {
+            data.pagamentos_recentes.forEach(p => {
+              total++;
+              html += `
+                <div class="px-4 py-3 border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-xs text-emerald-400 font-medium">Pago: ${p.titulo}</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">${p.data} · ${p.metodo} · ${p.conta_bancaria}</p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <span class="text-xs font-semibold text-emerald-400">-R$ ${p.valor.toFixed(2)}</span>
+                      <a href="/contas/boleto/${p.boleto_id}/" target="_blank" class="block text-[9px] text-cyan-400 hover:text-cyan-300 mt-0.5">Boleto ↗</a>
+                    </div>
+                  </div>
+                </div>`;
+            });
+          }
+
+          if (total === 0) {
+            html = '<div class="px-4 py-8 text-center"><p class="text-xs text-slate-500">Nenhuma notificação</p></div>';
+          }
+
+          list.innerHTML = html;
+          count.textContent = total;
+          if (total > 0) { dot.style.display = 'block'; } else { dot.style.display = 'none'; }
+        })
+        .catch(() => {
+          document.getElementById('notifList').innerHTML = '<div class="px-4 py-8 text-center"><p class="text-xs text-slate-500">Erro ao carregar notificações</p></div>';
+        });
+    }
+
+    // Auto-refresh balance data every 30s
+    function refreshBalances() {
+      fetch('/perfil/api/resumo/')
+        .then(r => r.json())
+        .then(data => {
+          // Update all elements with data-balance attribute
+          document.querySelectorAll('[data-balance]').forEach(el => {
+            const key = el.getAttribute('data-balance');
+            if (data[key] !== undefined) {
+              el.textContent = 'R$ ' + parseFloat(data[key]).toFixed(2);
+            }
+          });
+        })
+        .catch(() => { });
+    }
+    setInterval(refreshBalances, 30000);
+  </script>
+</body>
+
 </html>

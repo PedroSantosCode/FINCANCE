@@ -1,0 +1,353 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+
+{% block 'title' %}Pagar Conta — {{ conta_pagar.titulo }}{% endblock %}
+{% block 'page_title' %}Pagamento{% endblock %}
+{% block 'page_subtitle' %}Confirme o pagamento da conta{% endblock %}
+
+{% block 'head' %}
+<style>
+    .pay-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pay-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .account-option {
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+
+    .account-option:hover,
+    .account-option.selected {
+        border-color: rgba(34, 197, 94, 0.4) !important;
+        background: rgba(34, 197, 94, 0.06) !important;
+    }
+
+    .account-option.selected {
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+    }
+
+    .method-option {
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+
+    .method-option:hover,
+    .method-option.selected {
+        border-color: rgba(34, 197, 94, 0.4) !important;
+        background: rgba(34, 197, 94, 0.06) !important;
+    }
+
+    .method-option.selected {
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+    }
+
+    @keyframes checkmark {
+        0% {
+            transform: scale(0);
+        }
+
+        50% {
+            transform: scale(1.2);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .check-anim {
+        animation: checkmark 0.4s ease-out;
+    }
+</style>
+{% endblock %}
+
+{% block 'body' %}
+<div class="max-w-[960px] mx-auto">
+    <!-- Back button -->
+    <a href="{% url 'ver_contas' %}"
+        class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-emerald-400 transition-colors mb-6">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Voltar para Contas a Pagar
+    </a>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if ja_paga %}
+    <!-- Already paid banner -->
+    <div class="glass-card p-8 text-center mb-6">
+        <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-emerald-400 check-anim" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white font-display mb-2">Conta já foi paga este mês</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">A conta "{{ conta_pagar.titulo }}" já possui um pagamento registrado para
+            este mês.</p>
+        <a href="{% url 'ver_contas' %}" class="btn-gradient text-sm py-2.5 px-8">Voltar</a>
+    </div>
+    {% else %}
+
+    <form method="POST" id="paymentForm">
+        {% csrf_token %}
+        <div class="grid lg:grid-cols-5 gap-6">
+            <!-- LEFT: Bill details + account selection -->
+            <div class="lg:col-span-3 space-y-6">
+                <!-- Bill Summary -->
+                <div class="glass-card p-6">
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2 font-display">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Detalhes da Conta
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between py-2 border-b border-slate-200 dark:border-white/[.04]">
+                            <span class="text-xs text-slate-500 uppercase tracking-wider">Título</span>
+                            <span class="text-sm font-semibold text-slate-900 dark:text-white">{{ conta_pagar.titulo }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-slate-200 dark:border-white/[.04]">
+                            <span class="text-xs text-slate-500 uppercase tracking-wider">Categoria</span>
+                            <span
+                                class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full font-semibold">{{ conta_pagar.categoria }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-slate-200 dark:border-white/[.04]">
+                            <span class="text-xs text-slate-500 uppercase tracking-wider">Descrição</span>
+                            <span class="text-sm text-slate-700 dark:text-slate-300 text-right max-w-[60%]">{{ conta_pagar.descricao|truncatewords:15 }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-slate-200 dark:border-white/[.04]">
+                            <span class="text-xs text-slate-500 uppercase tracking-wider">Dia Vencimento</span>
+                            <span class="text-sm text-slate-700 dark:text-slate-300">Dia {{ conta_pagar.dia_pagamento }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-slate-200 dark:border-white/[.04]">
+                            <span class="text-xs text-slate-500 uppercase tracking-wider">Recorrente</span>
+                            <span class="text-sm text-slate-700 dark:text-slate-300">
+                                {% if conta_pagar.recorrente %}
+                                Sim
+                                {% else %}
+                                Não
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between py-3">
+                            <span class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Valor
+                                Total</span>
+                            <span class="text-xl font-bold text-emerald-400 font-display">R$ {{ conta_pagar.valor|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Selection -->
+                <div class="glass-card p-6">
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2 font-display">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        Selecionar Conta
+                    </h3>
+                    <input type="hidden" name="conta_bancaria" id="contaBancariaInput" required>
+                    <div class="space-y-2" id="accountList">
+                        {% for cb in contas_bancarias %}
+                        <div class="account-option flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-white/[.06] bg-white/[.02]"
+                            data-id="{{ cb.id }}" onclick="selectAccount(this, {{ cb.id }})">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-xl overflow-hidden bg-white/[.06] flex items-center justify-center flex-shrink-0">
+                                    {% if cb.icone %}
+                                    <img src="{{ cb.icone.url }}" alt="{{ cb.apelido }}"
+                                        class="w-full h-full object-cover">
+                                    {% else %}
+                                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                    </svg>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ cb.apelido }}</p>
+                                    <p class="text-[11px] text-slate-500">{{ cb.get_banco_display }} · {{ cb.get_tipo_display }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p
+                                    class="text-sm font-bold {% if cb.valor >= conta_pagar.valor %}text-emerald-400{% else %}text-red-400{% endif %}">
+                                    R$ {{ cb.valor|floatformat:2 }}
+                                </p>
+                                <p class="text-[10px] text-slate-600">Saldo disponível</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-8">
+                            <p class="text-sm text-slate-500">Nenhuma conta bancária cadastrada.</p>
+                            <a href="{% url 'gerenciar' %}"
+                                class="text-xs text-emerald-400 hover:text-emerald-300 mt-2 inline-block">Cadastrar
+                                conta →</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="glass-card p-6">
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2 font-display">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Método de Pagamento
+                    </h3>
+                    <input type="hidden" name="metodo_pagamento" id="metodoInput" value="boleto">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="method-option selected p-4 rounded-xl border border-slate-200 dark:border-white/[.06] bg-white/[.02] text-center"
+                            data-method="boleto" onclick="selectMethod(this, 'boleto')">
+                            <svg class="w-6 h-6 text-emerald-400 mx-auto mb-2" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-white">Boleto</p>
+                            <p class="text-[10px] text-slate-500">Bancário</p>
+                        </div>
+                        <div class="method-option p-4 rounded-xl border border-slate-200 dark:border-white/[.06] bg-white/[.02] text-center"
+                            data-method="pix" onclick="selectMethod(this, 'pix')">
+                            <svg class="w-6 h-6 text-cyan-400 mx-auto mb-2" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-white">PIX</p>
+                            <p class="text-[10px] text-slate-500">Instantâneo</p>
+                        </div>
+                        <div class="method-option p-4 rounded-xl border border-slate-200 dark:border-white/[.06] bg-white/[.02] text-center"
+                            data-method="debito" onclick="selectMethod(this, 'debito')">
+                            <svg class="w-6 h-6 text-amber-400 mx-auto mb-2" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-white">Débito</p>
+                            <p class="text-[10px] text-slate-500">Automático</p>
+                        </div>
+                        <div class="method-option p-4 rounded-xl border border-slate-200 dark:border-white/[.06] bg-white/[.02] text-center"
+                            data-method="transferencia" onclick="selectMethod(this, 'transferencia')">
+                            <svg class="w-6 h-6 text-violet-400 mx-auto mb-2" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-white">Transferência</p>
+                            <p class="text-[10px] text-slate-500">TED/DOC</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Payment summary + confirm -->
+            <div class="lg:col-span-2">
+                <div class="glass-card p-6 lg:sticky lg:top-[88px]">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-5 font-display">Resumo do Pagamento</h3>
+
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Conta</span>
+                            <span class="text-slate-700 dark:text-slate-300" id="summaryTitle">{{ conta_pagar.titulo }}</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Método</span>
+                            <span class="text-slate-700 dark:text-slate-300" id="summaryMethod">Boleto Bancário</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Conta Débito</span>
+                            <span class="text-slate-700 dark:text-slate-300" id="summaryAccount">Selecione...</span>
+                        </div>
+                        <div class="border-t border-slate-200 dark:border-white/[.04] pt-3"></div>
+                        <div class="flex justify-between">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">Total</span>
+                            <span class="text-lg font-bold text-emerald-400 font-display">R$ {{ conta_pagar.valor|floatformat:2 }}</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="confirmBtn" disabled
+                        class="btn-gradient w-full text-sm py-3 font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Confirmar Pagamento
+                        </span>
+                    </button>
+
+                    <p class="text-[10px] text-slate-600 text-center mt-3">O valor será debitado da conta selecionada
+                    </p>
+
+                    <div class="mt-5 pt-5 border-t border-slate-200 dark:border-white/[.04]">
+                        <div class="flex items-center gap-2 text-[10px] text-slate-600">
+                            <svg class="w-3.5 h-3.5 text-emerald-500/40" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Transação segura e criptografada
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+    const methodLabels = {
+        'boleto': 'Boleto Bancário',
+        'pix': 'PIX Instantâneo',
+        'debito': 'Débito Automático',
+        'transferencia': 'Transferência TED/DOC'
+    };
+
+    function selectAccount(el, id) {
+        document.querySelectorAll('.account-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('contaBancariaInput').value = id;
+        document.getElementById('summaryAccount').textContent = el.querySelector('.text-sm.font-semibold').textContent;
+        checkReady();
+    }
+
+    function selectMethod(el, method) {
+        document.querySelectorAll('.method-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('metodoInput').value = method;
+        document.getElementById('summaryMethod').textContent = methodLabels[method] || method;
+    }
+
+    function checkReady() {
+        const hasAccount = document.getElementById('contaBancariaInput').value !== '';
+        document.getElementById('confirmBtn').disabled = !hasAccount;
+    }
+
+    // Prevent double submit
+    document.getElementById('paymentForm')?.addEventListener('submit', function () {
+        const btn = document.getElementById('confirmBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processando...</span>';
+    });
+</script>
+{% endblock %}

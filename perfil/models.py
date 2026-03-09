@@ -19,17 +19,25 @@ class Categoria(models.Model):
         return total_valor
 
     def calcula_percentual_gasto_por_categoria(self):
+        if self.valor_planejamento == 0:
+            return 0
         return int((self.total_gasto() * 100) / self.valor_planejamento)
     
 class Conta(models.Model):
     banco_choices = (
-        ('NU', 'Nubank'),
-        ('CE', 'Caixa econômica'),
+        ('PS', 'Pessoal'),
+        ('TR', 'Trabalho'),
+        ('FM', 'Família'),
+        ('EC', 'Economia'),
+        ('IV', 'Investimentos'),
+        ('EM', 'Emergência'),
+        ('LZ', 'Lazer'),
+        ('ED', 'Educação'),
     )
 
     tipo_choices = (
-        ('pf', 'Pessoa física'),
-        ('pj', 'Pessoa jurídica'),
+        ('pf', 'Individual'),
+        ('pj', 'Compartilhado'),
     )
 
     apelido = models.CharField(max_length=50)

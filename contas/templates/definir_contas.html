@@ -1,69 +1,95 @@
 {% extends 'bases/base.html' %}
 {% load static %}
-{% block 'head' %}
 
-    <link href="{% static 'perfil/css/home.css' %}" rel="stylesheet">
-    <link href="{% static 'perfil/css/gerenciar.css' %}" rel="stylesheet">
-
-{% endblock %}
+{% block 'page_title' %}Contas Mensais{% endblock %}
+{% block 'page_subtitle' %}Adicionar contas mensais recorrentes{% endblock %}
 
 {% block 'body' %}
+<div class="max-w-3xl mx-auto">
 
-    <div class="container">
-        <br>
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        <br>
-        <span class="fonte-destaque">Adicionar contas mensais</span>
-        <div class="row">
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-            <div class="col-md-7">
-                <form action="{% url 'definir_contas' %}" method="POST">{% csrf_token %}
-                    <div class="row">
-                        <div class="col-md">
-                            <label>Título</label>
-                            <input name="titulo" type="text" class="form-control">
-                        </div>
+    <div class="glass-card p-8 lg:p-10 hover-lift relative">
+        <div class="absolute top-0 right-0 w-64 h-64 rounded-full opacity-[0.02] pointer-events-none"
+            style="background: radial-gradient(circle, #06B6D4, transparent 70%);"></div>
 
-                        <div class="col-md">
-                            <label>Categoria</label>
-                            <select name="categoria" class="form-select">
-                                {% for categoria in categorias %}
-                                    <option value="{{categoria.id}}">{{categoria}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <br>
-                    <label>Descrição</label>
-                    <textarea name="descricao" class="form-control"></textarea>
-                    <br>
-                    <div class="row">
-                        <div class="col-md">
-                            <label>Valor</label>  
-                            <input name="valor" type="number" class="form-control">
-                        </div>
-
-                        <div class="col-md">
-                            <label>Dia de pagamento</label>
-                            <input name="dia_pagamento" min="1" max="31" type="number" class="form-control">
-                        </div>
-                    </div>
-                    <br>
-                    <br>
-                    <input type="submit" style="width:40%;" class="botao-principal">
-
-                </form>
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
             </div>
-
-            <div class="col-md-8">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white font-display">Adicionar Conta Mensal</h3>
+                <p class="text-xs text-slate-500">Configure suas despesas recorrentes</p>
             </div>
-
         </div>
 
-    </div>
+        <form action="{% url 'definir_contas' %}" method="POST">{% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                <div>
+                    <label
+                        class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Título</label>
+                    <input name="titulo" type="text" class="form-input" placeholder="Ex: Aluguel">
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Categoria</label>
+                    <select name="categoria" class="form-input">
+                        {% for categoria in categorias %}
+                        <option value="{{categoria.id}}">{{categoria}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
+            <div class="mb-6">
+                <label
+                    class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Descrição</label>
+                <textarea name="descricao" class="form-input min-h-[90px] resize-none"
+                    placeholder="Detalhes da conta..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                <div>
+                    <label class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Valor
+                        (R$)</label>
+                    <div class="relative">
+                        <span
+                            class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-medium">R$</span>
+                        <input name="valor" type="number" class="form-input pl-10" placeholder="0.00" step="0.01">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Dia
+                        de Pagamento</label>
+                    <input name="dia_pagamento" min="1" max="31" type="number" class="form-input" placeholder="1-31">
+                </div>
+            </div>
+
+            <label
+                class="flex items-center gap-3 mb-8 cursor-pointer group px-4 py-3.5 rounded-xl border border-slate-200 dark:border-white/[0.06] hover:border-emerald-500/20 hover:bg-emerald-500/[0.03] transition-all">
+                <input type="checkbox" name="recorrente" value="1"
+                    class="w-4 h-4 rounded border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-white/5 text-emerald-500 focus:ring-emerald-500/20 cursor-pointer">
+                <div>
+                    <span
+                        class="text-sm text-emerald-400 font-semibold group-hover:text-emerald-300 transition-colors">Despesa
+                        recorrente</span>
+                    <p class="text-[10px] text-slate-500 mt-0.5">Será adicionada automaticamente todo mês</p>
+                </div>
+            </label>
+
+            <button type="submit" class="btn-gradient w-full py-4 text-sm font-bold tracking-wide">Cadastrar
+                Conta</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

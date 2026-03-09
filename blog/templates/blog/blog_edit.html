@@ -1,0 +1,65 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+
+{% block 'title' %}Editar Post - Finance.Bank Blog{% endblock %}
+{% block 'page_title' %}Editar Post{% endblock %}
+{% block 'page_subtitle' %}Editar artigo existente{% endblock %}
+
+{% block 'body' %}
+<div class="max-w-3xl mx-auto">
+    <a href="{% url 'blog_detail' post.slug %}"
+        class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-emerald-400 transition-colors mb-6">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Voltar ao Post
+    </a>
+
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="glass-card p-6 md:p-8">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white font-display mb-6">Editar Post</h2>
+        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">Título</label>
+                {{ form.title }}
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">Resumo</label>
+                {{ form.summary }}
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">Categoria</label>
+                {{ form.category }}
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">Imagem de Capa</label>
+                {% if post.image %}
+                <div class="mb-3 flex items-center gap-3">
+                    <img src="{{ post.image.url }}" alt="" class="h-16 w-24 object-cover rounded-lg">
+                    <span class="text-xs text-slate-500">Imagem atual</span>
+                </div>
+                {% endif %}
+                <input type="file" name="image" accept="image/*"
+                    class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-500/10 file:text-emerald-400 hover:file:bg-emerald-500/20">
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">Conteúdo</label>
+                {{ form.content }}
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-gradient text-sm py-3 px-8">Salvar Alterações</button>
+                <a href="{% url 'blog_detail' post.slug %}"
+                    class="bg-white/[.04] border border-slate-200 dark:border-white/[.06] text-slate-700 dark:text-slate-300 text-sm py-3 px-8 rounded-xl text-center hover:bg-white/[.08] transition-all font-medium">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

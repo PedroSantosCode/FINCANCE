@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <title>Boleto Bancário — {{ conta_pagar.titulo }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 20mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 10px;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid #0B1120;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .header .bank-logo {
+            width: 140px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #0B1120;
+            letter-spacing: -0.5px;
+        }
+
+        .header .bank-logo .dot {
+            color: #22C55E;
+        }
+
+        .header .bank-code {
+            border-left: 3px solid #0B1120;
+            border-right: 3px solid #0B1120;
+            padding: 5px 15px;
+            font-size: 16px;
+            font-weight: 800;
+            text-align: center;
+            margin: 0 15px;
+            min-width: 70px;
+        }
+
+        .header .barcode-line {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: right;
+            letter-spacing: 1px;
+            word-break: break-all;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            border: 1px solid #ccc;
+            margin-bottom: 2px;
+        }
+
+        .info-grid.two-cols {
+            grid-template-columns: 2fr 1fr;
+        }
+
+        .info-grid.four-cols {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+
+        .info-cell {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+        }
+
+        .info-cell .label {
+            font-size: 7px;
+            text-transform: uppercase;
+            color: #666;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .info-cell .value {
+            font-size: 10px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .info-cell .value.large {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .barcode-area {
+            margin: 20px 0;
+            text-align: center;
+            padding: 15px 0;
+            border-top: 2px dashed #ccc;
+            border-bottom: 2px dashed #ccc;
+        }
+
+        .barcode-visual {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 1px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .barcode-visual .bar {
+            background: #000;
+            display: inline-block;
+        }
+
+        .barcode-number {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #333;
+        }
+
+        .section-title {
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin: 15px 0 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin-top: 10px;
+        }
+
+        .instructions p {
+            font-size: 8px;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .instructions p:last-child {
+            margin-bottom: 0;
+        }
+
+        .cut-line {
+            margin: 20px 0;
+            border-top: 1px dashed #999;
+            position: relative;
+        }
+
+        .cut-line::before {
+            content: '✂';
+            position: absolute;
+            left: -5px;
+            top: -9px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .receipt {
+            opacity: 0.85;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 7px;
+            color: #999;
+        }
+
+        .stamp {
+            display: inline-block;
+            border: 2px solid #22C55E;
+            color: #22C55E;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transform: rotate(-5deg);
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            opacity: 0.7;
+        }
+
+        .relative {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== FICHA DE COMPENSAÇÃO ===== -->
+    <div class="header">
+        <div class="bank-logo">Finance<span class="dot">.Bank</span></div>
+        <div class="bank-code">104-0</div>
+        <div class="barcode-line">{{ codigo_formatado }}</div>
+    </div>
+
+    <div class="info-grid two-cols">
+        <div class="info-cell">
+            <div class="label">Local de Pagamento</div>
+            <div class="value">Pagável em qualquer banco até o vencimento</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Vencimento</div>
+            <div class="value large">{{ data_vencimento }}</div>
+        </div>
+    </div>
+
+    <div class="info-grid two-cols">
+        <div class="info-cell">
+            <div class="label">Beneficiário</div>
+            <div class="value">{{ conta_pagar.titulo }} — {{ conta_pagar.categoria }}</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Agência / Código do Beneficiário</div>
+            <div class="value">0001 / {{ pagamento.nosso_numero }}</div>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-cell">
+            <div class="label">Data do Documento</div>
+            <div class="value">{{ data_pagamento }}</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Nº do Documento</div>
+            <div class="value">{{ pagamento.id }}</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Nosso Número</div>
+            <div class="value">{{ pagamento.nosso_numero }}</div>
+        </div>
+    </div>
+
+    <div class="info-grid four-cols">
+        <div class="info-cell">
+            <div class="label">Espécie Doc.</div>
+            <div class="value">DM</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Aceite</div>
+            <div class="value">N</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Data Processamento</div>
+            <div class="value">{{ data_pagamento }}</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Carteira</div>
+            <div class="value">SR</div>
+        </div>
+    </div>
+
+    <div class="info-grid two-cols">
+        <div class="info-cell">
+            <div class="label">Uso do Banco</div>
+            <div class="value">&nbsp;</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Valor do Documento (=)</div>
+            <div class="value large">R$ {{ pagamento.valor_pago|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <div class="info-grid two-cols relative">
+        <div class="info-cell" style="min-height: 60px;">
+            <div class="label">Instruções</div>
+            <div class="value" style="font-size: 8px; font-weight: 400; line-height: 1.6;">
+                Não receber após o vencimento.<br>
+                Juros de mora: 1% ao mês.<br>
+                Multa por atraso: 2%.<br>
+                {{ conta_pagar.descricao|truncatewords:30 }}
+            </div>
+        </div>
+        <div class="info-cell">
+            <div class="label">(-) Desconto / Abatimento</div>
+            <div class="value">R$ 0,00</div>
+            <div class="label" style="margin-top: 8px;">(-) Outras Deduções</div>
+            <div class="value">R$ 0,00</div>
+            <div class="label" style="margin-top: 8px;">(+) Mora / Multa</div>
+            <div class="value">R$ 0,00</div>
+            <div class="label" style="margin-top: 8px;">(=) Valor Cobrado</div>
+            <div class="value large">R$ {{ pagamento.valor_pago|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <div class="info-grid two-cols">
+        <div class="info-cell">
+            <div class="label">Pagador</div>
+            <div class="value">{{ banco_nome }} — {{ banco_perfil }}</div>
+        </div>
+        <div class="info-cell">
+            <div class="label">Método</div>
+            <div class="value">{{ pagamento.get_metodo_pagamento_display }}</div>
+        </div>
+    </div>
+
+    <!-- Barcode area -->
+    <div class="barcode-area">
+        <div class="barcode-visual">
+            {% for c in pagamento.codigo_barras %}
+            {% if forloop.counter|divisibleby:2 %}
+            <span class="bar" style="width: 2px; height: {{ forloop.counter|add:25 }}px;"></span>
+            {% else %}
+            <span class="bar" style="width: 1px; height: {{ forloop.counter|add:20 }}px; background: #666;"></span>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <div class="barcode-number">{{ codigo_formatado }}</div>
+    </div>
+
+    <!-- Stamp for paid boletos -->
+    <div style="text-align: center; margin: 15px 0;">
+        <span
+            style="display: inline-block; border: 3px solid #22C55E; color: #22C55E; padding: 10px 30px; font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 4px; transform: rotate(-3deg);">
+            PAGO
+        </span>
+        <p style="font-size: 9px; color: #666; margin-top: 8px;">
+            Pagamento confirmado em {{ data_pagamento }} via {{ pagamento.get_metodo_pagamento_display }}
+        </p>
+    </div>
+
+    <div class="cut-line"></div>
+
+    <!-- ===== RECIBO DO PAGADOR ===== -->
+    <div class="receipt">
+        <div class="section-title">Recibo do Pagador</div>
+        <div class="header" style="margin-bottom: 10px;">
+            <div class="bank-logo" style="font-size: 16px;">Finance<span class="dot">.Bank</span></div>
+            <div class="bank-code" style="font-size: 13px;">104-0</div>
+            <div class="barcode-line" style="font-size: 10px;">{{ codigo_formatado }}</div>
+        </div>
+        <div class="info-grid four-cols">
+            <div class="info-cell">
+                <div class="label">Beneficiário</div>
+                <div class="value">{{ conta_pagar.titulo }}</div>
+            </div>
+            <div class="info-cell">
+                <div class="label">Vencimento</div>
+                <div class="value">{{ data_vencimento }}</div>
+            </div>
+            <div class="info-cell">
+                <div class="label">Nosso Número</div>
+                <div class="value">{{ pagamento.nosso_numero }}</div>
+            </div>
+            <div class="info-cell">
+                <div class="label">Valor</div>
+                <div class="value">R$ {{ pagamento.valor_pago|floatformat:2 }}</div>
+            </div>
+        </div>
+        <div class="instructions">
+            <p>Este é o comprovante de pagamento. Guarde-o para sua segurança.</p>
+            <p>Autenticação mecânica: {{ pagamento.codigo_barras|truncatechars:20 }} — {{ data_pagamento }}</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Finance.Bank — Gerenciador de Gastos Inteligente — Documento gerado em {{ now|date:"d/m/Y H:i" }}</p>
+    </div>
+</body>
+
+</html>

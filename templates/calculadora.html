@@ -1,0 +1,373 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+
+{% block 'page_title' %}Calculadora{% endblock %}
+{% block 'page_subtitle' %}Calculadora financeira inteligente{% endblock %}
+
+{% block 'head' %}
+<style>
+    .calc-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        aspect-ratio: 1;
+        user-select: none;
+    }
+
+    .calc-btn:active {
+        transform: scale(0.95);
+    }
+
+    .calc-num {
+        background: rgba(30, 41, 59, 0.5);
+        color: #E2E8F0;
+    }
+
+    .calc-num:hover {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .calc-op {
+        background: rgba(34, 197, 94, 0.08);
+        color: #34D399;
+    }
+
+    .calc-op:hover {
+        background: rgba(34, 197, 94, 0.15);
+        border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    .calc-special {
+        background: rgba(239, 68, 68, 0.08);
+        color: #F87171;
+    }
+
+    .calc-special:hover {
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .calc-equal {
+        background: linear-gradient(135deg, #22C55E, #14B8A6);
+        color: #0B1120;
+        border: none;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+    }
+
+    .calc-equal:hover {
+        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+        transform: translateY(-1px);
+    }
+
+    .calc-equal:active {
+        transform: scale(0.95) translateY(0);
+    }
+
+    .history-item {
+        transition: all 0.2s ease;
+    }
+
+    .history-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+</style>
+{% endblock %}
+
+{% block 'body' %}
+<div class="max-w-5xl mx-auto">
+    <div class="grid grid-cols-12 gap-5 lg:gap-6">
+        <!-- Calculator -->
+        <div class="col-span-12 lg:col-span-7">
+            <div class="glass-card p-6 lg:p-8 hover-lift">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white font-display">Calculadora</h3>
+                        <p class="text-xs text-slate-500">Cálculos rápidos e precisos</p>
+                    </div>
+                </div>
+
+                <!-- Display -->
+                <div class="rounded-xl p-5 mb-5 border border-slate-200 dark:border-white/[0.04] relative overflow-hidden"
+                    style="background: rgba(15, 23, 42, 0.8);">
+                    <div
+                        class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent">
+                    </div>
+                    <p id="calcExpression"
+                        class="text-right text-sm text-slate-500 font-mono min-h-[20px] mb-1 overflow-x-auto">&nbsp;</p>
+                    <p id="calcDisplay"
+                        class="text-right text-4xl font-bold text-slate-900 dark:text-white font-display tracking-tight overflow-x-auto">0
+                    </p>
+                </div>
+
+                <!-- Buttons grid -->
+                <div class="grid grid-cols-4 gap-2.5">
+                    <button class="calc-btn calc-special" onclick="calcClear()">C</button>
+                    <button class="calc-btn calc-special" onclick="calcBackspace()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l7-7 11 0v14H10L3 12z" />
+                        </svg>
+                    </button>
+                    <button class="calc-btn calc-op" onclick="calcInput('%')">%</button>
+                    <button class="calc-btn calc-op" onclick="calcInput('/')">÷</button>
+
+                    <button class="calc-btn calc-num" onclick="calcInput('7')">7</button>
+                    <button class="calc-btn calc-num" onclick="calcInput('8')">8</button>
+                    <button class="calc-btn calc-num" onclick="calcInput('9')">9</button>
+                    <button class="calc-btn calc-op" onclick="calcInput('*')">×</button>
+
+                    <button class="calc-btn calc-num" onclick="calcInput('4')">4</button>
+                    <button class="calc-btn calc-num" onclick="calcInput('5')">5</button>
+                    <button class="calc-btn calc-num" onclick="calcInput('6')">6</button>
+                    <button class="calc-btn calc-op" onclick="calcInput('-')">−</button>
+
+                    <button class="calc-btn calc-num" onclick="calcInput('1')">1</button>
+                    <button class="calc-btn calc-num" onclick="calcInput('2')">2</button>
+                    <button class="calc-btn calc-num" onclick="calcInput('3')">3</button>
+                    <button class="calc-btn calc-op" onclick="calcInput('+')">+</button>
+
+                    <button class="calc-btn calc-num" onclick="calcInput('(')">(</button>
+                    <button class="calc-btn calc-num" onclick="calcInput('0')">0</button>
+                    <button class="calc-btn calc-num" onclick="calcInput('.')">.</button>
+                    <button class="calc-btn calc-equal" onclick="calcEquals()">=</button>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="flex items-center gap-2 mt-4 pt-4 border-t border-slate-200 dark:border-white/[0.04]">
+                    <button onclick="calcInput(')')"
+                        class="text-[11px] text-slate-500 dark:text-slate-400 bg-white/[0.04] px-3 py-1.5 rounded-lg hover:bg-white/[0.08] transition-colors border border-slate-200 dark:border-white/[0.04]">)</button>
+                    <button onclick="calcNegate()"
+                        class="text-[11px] text-slate-500 dark:text-slate-400 bg-white/[0.04] px-3 py-1.5 rounded-lg hover:bg-white/[0.08] transition-colors border border-slate-200 dark:border-white/[0.04]">+/−</button>
+                    <button onclick="calcSquareRoot()"
+                        class="text-[11px] text-slate-500 dark:text-slate-400 bg-white/[0.04] px-3 py-1.5 rounded-lg hover:bg-white/[0.08] transition-colors border border-slate-200 dark:border-white/[0.04]">√</button>
+                    <button onclick="calcPower()"
+                        class="text-[11px] text-slate-500 dark:text-slate-400 bg-white/[0.04] px-3 py-1.5 rounded-lg hover:bg-white/[0.08] transition-colors border border-slate-200 dark:border-white/[0.04]">x²</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History + Tips -->
+        <div class="col-span-12 lg:col-span-5 space-y-5">
+            <!-- History -->
+            <div class="glass-card p-6 hover-lift">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Histórico</h3>
+                    <button onclick="clearHistory()"
+                        class="text-[10px] text-red-400 hover:text-red-300 font-medium transition-colors">Limpar</button>
+                </div>
+                <div id="calcHistory" class="space-y-1 max-h-64 overflow-y-auto">
+                    <div class="text-center py-6">
+                        <svg class="w-8 h-8 text-slate-700 mx-auto mb-2" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-xs text-slate-600">Nenhum cálculo ainda</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Tips -->
+            <div class="glass-card p-6 hover-lift">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Dicas Financeiras</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="rounded-lg p-3 border border-slate-200 dark:border-white/[0.04]" style="background: rgba(34,197,94,0.03);">
+                        <p class="text-xs text-slate-500 dark:text-slate-400"><span class="text-emerald-400 font-semibold">Regra
+                                50/30/20:</span> 50% necessidades, 30% desejos, 20% poupança.</p>
+                    </div>
+                    <div class="rounded-lg p-3 border border-slate-200 dark:border-white/[0.04]" style="background: rgba(6,182,212,0.03);">
+                        <p class="text-xs text-slate-500 dark:text-slate-400"><span class="text-cyan-400 font-semibold">Reserva de
+                                emergência:</span> Tenha pelo menos 6 meses de despesas guardados.</p>
+                    </div>
+                    <div class="rounded-lg p-3 border border-slate-200 dark:border-white/[0.04]" style="background: rgba(251,191,36,0.03);">
+                        <p class="text-xs text-slate-500 dark:text-slate-400"><span class="text-amber-400 font-semibold">Controle
+                                diário:</span> Anote todos os gastos imediatamente depois de fazer.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let expression = '';
+    let lastResult = '';
+    let history = JSON.parse(localStorage.getItem('calcHistory') || '[]');
+
+    const display = document.getElementById('calcDisplay');
+    const exprDisplay = document.getElementById('calcExpression');
+
+    function updateDisplay() {
+        // Format expression for display
+        let shown = expression || '0';
+        shown = shown.replace(/\*/g, '×').replace(/\//g, '÷');
+        display.textContent = shown;
+    }
+
+    function calcInput(char) {
+        const ops = ['+', '-', '*', '/', '%'];
+        // Prevent multiple operators in a row
+        if (ops.includes(char) && ops.includes(expression.slice(-1))) {
+            expression = expression.slice(0, -1);
+        }
+        expression += char;
+        updateDisplay();
+    }
+
+    function calcClear() {
+        expression = '';
+        lastResult = '';
+        exprDisplay.innerHTML = '&nbsp;';
+        display.textContent = '0';
+    }
+
+    function calcBackspace() {
+        expression = expression.slice(0, -1);
+        updateDisplay();
+        if (!expression) display.textContent = '0';
+    }
+
+    function calcEquals() {
+        if (!expression) return;
+        try {
+            // Show the expression above
+            let exprShow = expression.replace(/\*/g, '×').replace(/\//g, '÷');
+            exprDisplay.textContent = exprShow;
+
+            // Evaluate
+            let result = Function('"use strict"; return (' + expression + ')')();
+
+            // Round to avoid floating point issues
+            result = Math.round(result * 1e10) / 1e10;
+
+            // Add to history
+            addToHistory(exprShow, result);
+
+            lastResult = String(result);
+            expression = lastResult;
+            display.textContent = formatNumber(result);
+        } catch (e) {
+            display.textContent = 'Erro';
+            expression = '';
+            setTimeout(() => { display.textContent = '0'; }, 1500);
+        }
+    }
+
+    function formatNumber(n) {
+        if (Number.isInteger(n) && Math.abs(n) < 1e15) {
+            return n.toLocaleString('pt-BR');
+        }
+        return parseFloat(n.toFixed(8)).toLocaleString('pt-BR', { maximumFractionDigits: 8 });
+    }
+
+    function calcNegate() {
+        if (expression && !isNaN(expression)) {
+            expression = String(-parseFloat(expression));
+            updateDisplay();
+        }
+    }
+
+    function calcSquareRoot() {
+        if (expression) {
+            try {
+                let val = Function('"use strict"; return (' + expression + ')')();
+                let result = Math.sqrt(val);
+                exprDisplay.textContent = '√(' + expression.replace(/\*/g, '×').replace(/\//g, '÷') + ')';
+                addToHistory('√(' + expression + ')', result);
+                expression = String(result);
+                display.textContent = formatNumber(result);
+            } catch (e) { display.textContent = 'Erro'; expression = ''; }
+        }
+    }
+
+    function calcPower() {
+        if (expression) {
+            try {
+                let val = Function('"use strict"; return (' + expression + ')')();
+                let result = val * val;
+                exprDisplay.textContent = '(' + expression.replace(/\*/g, '×').replace(/\//g, '÷') + ')²';
+                addToHistory('(' + expression + ')²', result);
+                expression = String(result);
+                display.textContent = formatNumber(result);
+            } catch (e) { display.textContent = 'Erro'; expression = ''; }
+        }
+    }
+
+    function addToHistory(expr, result) {
+        history.unshift({ expr, result: formatNumber(result), timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
+        if (history.length > 15) history.pop();
+        localStorage.setItem('calcHistory', JSON.stringify(history));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('calcHistory');
+        if (history.length === 0) {
+            container.innerHTML = '<div class="text-center py-6"><svg class="w-8 h-8 text-slate-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p class="text-xs text-slate-600">Nenhum cálculo ainda</p></div>';
+            return;
+        }
+        container.innerHTML = history.map((h, i) => `
+            <div class="history-item flex items-center justify-between py-2.5 px-3 rounded-lg cursor-pointer" onclick="loadFromHistory(${i})" style="animation: slideUp 0.2s ease-out ${i * 30}ms both;">
+                <div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">${h.expr}</p>
+                    <p class="text-[10px] text-slate-600">${h.timestamp}</p>
+                </div>
+                <span class="text-sm font-semibold text-emerald-400">= ${h.result}</span>
+            </div>
+        `).join('');
+    }
+
+    function loadFromHistory(index) {
+        const h = history[index];
+        display.textContent = h.result;
+        expression = String(h.result).replace(/\./g, '.').replace(/,/g, '.');
+        // Try to parse localized number back
+        try {
+            let parsed = parseFloat(h.result.replace(/\./g, '').replace(',', '.'));
+            if (!isNaN(parsed)) expression = String(parsed);
+        } catch (e) { }
+        exprDisplay.textContent = h.expr;
+    }
+
+    function clearHistory() {
+        history = [];
+        localStorage.removeItem('calcHistory');
+        renderHistory();
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', function (e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+        const key = e.key;
+        if (/[0-9]/.test(key)) { calcInput(key); e.preventDefault(); }
+        else if (['+', '-', '*', '/', '%', '(', ')', '.'].includes(key)) { calcInput(key); e.preventDefault(); }
+        else if (key === 'Enter' || key === '=') { calcEquals(); e.preventDefault(); }
+        else if (key === 'Backspace') { calcBackspace(); e.preventDefault(); }
+        else if (key === 'Escape' || key === 'Delete') { calcClear(); e.preventDefault(); }
+    });
+
+    // Initial render
+    renderHistory();
+</script>
+{% endblock %}

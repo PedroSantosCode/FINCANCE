@@ -1,56 +1,309 @@
 {% extends 'bases/base.html' %}
 {% load static %}
-{% block 'head' %}
 
-    <link href="{% static 'perfil/css/home.css' %}" rel="stylesheet">
-    <link href="{% static 'perfil/css/gerenciar.css' %}" rel="stylesheet">
-    <link href="{% static 'contas/css/contas.css' %}" rel="stylesheet">
-
-{% endblock %}
+{% block 'page_title' %}Analytics{% endblock %}
+{% block 'page_subtitle' %}Gráficos e análises financeiras{% endblock %}
 
 {% block 'body' %}
+<div class="max-w-[1440px] mx-auto">
 
-    <div class="container">
-        <br>
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        <br>
-        <div class="row">
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-            <div class="col-md">
-                <span class="fonte-destaque">Gastos por categoria</span>
-                <div>
-                    <canvas id="myChart"></canvas>
-                </div>
-
-
-
-            </div>
-
-        </div>
-
+    <!-- Period selector -->
+    <div class="flex items-center gap-2 mb-6">
+        <span class="text-[10px] text-slate-500 uppercase tracking-[0.15em] font-semibold mr-2">Período:</span>
+        <a href="?meses=3"
+            class="text-[11px] px-3 py-1.5 rounded-lg font-medium transition-all border {% if meses_param == 3 %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20{% else %}text-slate-500 dark:text-slate-400 bg-white/[0.04] border-slate-200 dark:border-white/[0.04] hover:bg-white/[0.08]{% endif %}">3
+            meses</a>
+        <a href="?meses=6"
+            class="text-[11px] px-3 py-1.5 rounded-lg font-medium transition-all border {% if meses_param == 6 %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20{% else %}text-slate-500 dark:text-slate-400 bg-white/[0.04] border-slate-200 dark:border-white/[0.04] hover:bg-white/[0.08]{% endif %}">6
+            meses</a>
+        <a href="?meses=12"
+            class="text-[11px] px-3 py-1.5 rounded-lg font-medium transition-all border {% if meses_param == 12 %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20{% else %}text-slate-500 dark:text-slate-400 bg-white/[0.04] border-slate-200 dark:border-white/[0.04] hover:bg-white/[0.08]{% endif %}">12
+            meses</a>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 mb-6">
+        <!-- Gastos por Categoria -->
+        <div class="glass-card p-6 hover-lift relative overflow-hidden">
+            <div
+                class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent">
+            </div>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                    <svg class="w-4.5 h-4.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Gastos por Categoria
+                    </h3>
+                    <p class="text-[10px] text-slate-500">Clique em uma barra para ver detalhes</p>
+                </div>
+            </div>
+            <canvas id="chartCategoria" class="w-full" style="max-height: 280px;"></canvas>
+        </div>
 
-    <script>
-    const ctx = document.getElementById('myChart');
+        <!-- Evolução Mensal -->
+        <div class="glass-card p-6 hover-lift relative overflow-hidden">
+            <div
+                class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent">
+            </div>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                    <svg class="w-4.5 h-4.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Evolução Mensal</h3>
+                    <p class="text-[10px] text-slate-500">Últimos {{ meses_param }} meses</p>
+                </div>
+            </div>
+            <canvas id="chartEvolucao" class="w-full" style="max-height: 280px;"></canvas>
+        </div>
+    </div>
 
-    new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: {{ labels|safe }},
-        datasets: ({
-            label: 'Gastos por categoria',
-            data: dataValues,
-        }),
-        },    
+    <!-- Saldo ao Longo do Tempo -->
+    <div class="glass-card p-6 hover-lift relative overflow-hidden">
+        <div
+            class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-teal-500/20 to-transparent">
+        </div>
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-teal-500/10 flex items-center justify-center">
+                    <svg class="w-4.5 h-4.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white font-display">Saldo ao Longo do
+                        Tempo</h3>
+                    <p class="text-[10px] text-slate-500">Evolução patrimonial</p>
+                </div>
+            </div>
+            <span
+                class="text-[10px] text-slate-500 bg-white/[0.04] px-3 py-1.5 rounded-lg font-medium border border-slate-200 dark:border-white/[0.04]">{{
+                meses_param }}
+                meses</span>
+        </div>
+        <canvas id="chartSaldo" class="w-full" style="max-height: 300px;"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    Chart.defaults.color = 'rgba(148, 163, 184, 0.6)';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.03)';
+    Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+    Chart.defaults.font.size = 11;
+
+    const tooltipConfig = {
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        borderColor: 'rgba(255,255,255,0.06)',
+        borderWidth: 1,
+        titleFont: { weight: '600', size: 12 },
+        bodyFont: { size: 11 },
+        padding: 14,
+        cornerRadius: 10,
+        displayColors: true,
+        callbacks: {
+            label: function (context) {
+                return context.dataset.label + ': R$ ' + context.parsed.y.toFixed(2);
+            }
+        }
+    };
+
+    // Gastos por Categoria (Bar) - clickable
+    const catChart = new Chart(document.getElementById('chartCategoria'), {
+        type: 'bar',
+        data: {
+            labels: {{ cat_labels| safe }},
+    datasets: [{
+        label: 'Gastos (R$)',
+        data: {{ cat_values| safe }},
+        backgroundColor: [
+        'rgba(34, 197, 94, 0.5)',
+        'rgba(239, 68, 68, 0.5)',
+        'rgba(6, 182, 212, 0.5)',
+        'rgba(251, 191, 36, 0.5)',
+        'rgba(168, 85, 247, 0.5)',
+        'rgba(244, 114, 182, 0.5)',
+        'rgba(45, 212, 191, 0.5)',
+        'rgba(99, 102, 241, 0.5)',
+    ],
+        borderColor: [
+        'rgba(34, 197, 94, 0.8)',
+        'rgba(239, 68, 68, 0.8)',
+        'rgba(6, 182, 212, 0.8)',
+        'rgba(251, 191, 36, 0.8)',
+        'rgba(168, 85, 247, 0.8)',
+        'rgba(244, 114, 182, 0.8)',
+        'rgba(45, 212, 191, 0.8)',
+        'rgba(99, 102, 241, 0.8)',
+    ],
+        borderWidth: 1,
+        borderRadius: 8,
+        borderSkipped: false,
+        hoverBackgroundColor: [
+        'rgba(34, 197, 94, 0.7)',
+        'rgba(239, 68, 68, 0.7)',
+        'rgba(6, 182, 212, 0.7)',
+        'rgba(251, 191, 36, 0.7)',
+        'rgba(168, 85, 247, 0.7)',
+        'rgba(244, 114, 182, 0.7)',
+        'rgba(45, 212, 191, 0.7)',
+        'rgba(99, 102, 241, 0.7)', v
+    ],
+            }]
+        },
+    options: {
+        responsive: true,
+            plugins: {
+            legend: { display: false },
+            tooltip: tooltipConfig
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,0.02)', drawBorder: false },
+                ticks: { padding: 10 }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { padding: 8 }
+            }
+        },
+        onClick: function(evt, elements) {
+            if (elements.length > 0) {
+                const idx = elements[0].index;
+                const catName = this.data.labels[idx];
+                const catValue = this.data.datasets[0].data[idx];
+                // Show detailed info
+                alert('Categoria: ' + catName + '\nGasto total: R$ ' + catValue.toFixed(2));
+            }
+        }
+    }
     });
 
+    // Evolução Mensal (Line)
+    new Chart(document.getElementById('chartEvolucao'), {
+        type: 'line',
+        data: {
+            labels: {{ evolucao_labels| safe }},
+        datasets: [{
+            label: 'Entradas (R$)',
+            data: {{ evolucao_entradas| safe }},
+        borderColor: '#22C55E',
+        backgroundColor: 'rgba(34, 197, 94, 0.06)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#22C55E',
+        pointBorderColor: '#0B1120',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        borderWidth: 2.5,
+            }, {
+            label: 'Saídas (R$)',
+            data: {{ evolucao_saidas| safe }},
+        borderColor: '#EF4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.06)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#EF4444',
+        pointBorderColor: '#0B1120',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        borderWidth: 2.5,
+            }]
+        },
+        options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            tooltip: tooltipConfig,
+            legend: {
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    padding: 20,
+                    boxHeight: 8,
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.02)', drawBorder: false },
+                ticks: { padding: 10 }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { padding: 8 }
+            }
+        }
+    }
+    });
+
+    // Saldo ao Longo do Tempo (Line)
+    new Chart(document.getElementById('chartSaldo'), {
+        type: 'line',
+        data: {
+            labels: {{ saldo_labels| safe }},
+        datasets: [{
+            label: 'Saldo (R$)',
+            data: {{ saldo_values| safe }},
+        borderColor: '#2DD4BF',
+        backgroundColor: (context) => {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return 'rgba(45, 212, 191, 0.06)';
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, 'rgba(45, 212, 191, 0.12)');
+            gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
+            return gradient;
+        },
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#2DD4BF',
+        pointBorderColor: '#0B1120',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        borderWidth: 3,
+            }]
+        },
+        options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: { display: false },
+            tooltip: tooltipConfig
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                grid: { color: 'rgba(255,255,255,0.02)', drawBorder: false },
+                ticks: { padding: 10 }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { padding: 8 }
+            }
+        }
+    }
+    });
 </script>
-
-
 {% endblock %}
