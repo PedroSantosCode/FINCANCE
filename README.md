@@ -1,175 +1,178 @@
-# 💰 FINANCE.BANK
+<div align="center">
 
-> **Plataforma de Gestão Financeira Pessoal** — uma aplicação web full-stack para controle de entradas, saídas, contas bancárias, planejamento orçamentário e metas financeiras, com design premium dark-mode.
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Django-6.0-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
+  <img src="https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
+  <img src="https://img.shields.io/badge/WeasyPrint-68.1-FF6B6B?style=for-the-badge" alt="WeasyPrint">
+  <img src="https://img.shields.io/badge/Chart.js-CDN-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" alt="Chart.js">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-CDN-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind">
 
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
-![Django](https://img.shields.io/badge/Django-6.0-092E20?style=flat&logo=django&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-CDN-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)
+  <br/><br/>
+
+  <h1>💳 FINANCE.BANK</h1>
+  <p><strong>Gestão Financeira Pessoal com estética institucional dark-mode</strong></p>
+
+  <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&h=400&fit=crop&q=80" alt="Finance Dashboard Banner" width="100%" style="border-radius:12px; margin: 20px 0;"/>
+
+</div>
 
 ---
 
 ## 📋 Sobre o Projeto
 
-O **FINANCE.BANK** é uma aplicação de gestão financeira pessoal construída com Django. Permite ao usuário gerenciar contas bancárias, registrar entradas e saídas, definir planejamento por categoria, acompanhar metas financeiras, visualizar análises gráficas e exportar extratos em PDF.
+**FINANCE.BANK** é uma aplicação web completa de **gestão financeira pessoal**, construída com Django. Ela permite ao usuário controlar suas finanças com uma interface premium no estilo *wealth management* — dark mode, glassmorphism e micro-animações.
 
-A interface foi projetada com estética institucional dark-mode, utilizando glassmorphism, micro-animações e uma paleta de cores profissional voltada para wealth management.
-
----
-
-## 🧱 Arquitetura
-
-O projeto segue a arquitetura MVT (Model-View-Template) do Django, dividido em 4 apps independentes:
-
-```
-FINCANCE_PSW/
-├── core/               # Configurações do projeto (settings, urls, wsgi)
-├── perfil/             # Contas bancárias, categorias, dashboard analytics
-├── extrato/            # Transações (entradas/saídas), exportação de extrato PDF
-├── contas/             # Contas a pagar mensais e recorrentes
-├── planejamento/       # Planejamento por categoria e metas financeiras
-├── templates/          # Templates globais (base.html, gerenciar.html)
-│   ├── bases/          # Template base com sidebar e header
-│   ├── partials/       # Template HTML para geração de PDF
-│   └── static/         # CSS estáticos
-└── media/              # Uploads (ícones das contas bancárias, logo)
-```
+> 🎯 **Para que serve?** Acompanhar saldo de contas bancárias, registrar entradas e saídas, definir metas e orçamentos por categoria, visualizar analytics com gráficos e exportar extratos em PDF.
 
 ---
 
-## ⚙️ Tecnologias Utilizadas
+## ✨ Funcionalidades
 
-### Backend
-| Tecnologia | Versão | Finalidade |
+| Módulo | Funcionalidades |
+|--------|----------------|
+| 🏠 **Dashboard** | Saldo total, entradas/saídas do mês, gauge de equilíbrio financeiro, alertas de orçamento |
+| 📊 **Analytics** | Gráfico de barras (gastos/categoria), linha (evolução 6 meses), área (patrimônio acumulado) |
+| 📄 **Extrato** | Listagem filtrada por conta/categoria, exportação em **PDF** via WeasyPrint |
+| ➕ **Novo Valor** | Registro de transações com **sugestão automática de categoria via IA** por palavras-chave |
+| ⚙️ **Gerenciar** | Cadastro de contas bancárias (com ícone), categorias (essencial/não essencial) |
+| 💰 **Contas a Pagar** | Contas mensais recorrentes agrupadas: vencidas, próximas (5 dias), restantes |
+| 🎯 **Planejamento** | Orçamento por categoria com barra de progresso (verde/amarelo/vermelho) + metas financeiras |
+| ✍️ **Blog** | Blog integrado para dicas e conteúdo financeiro |
+
+---
+
+## 🛠️ Stack Tecnológica
+
+### 🐍 Backend
+| Tecnologia | Versão | Uso |
 |---|---|---|
 | **Python** | 3.11+ | Linguagem principal |
-| **Django** | 6.0 | Framework web (MVT) |
-| **WeasyPrint** | 68.1 | Geração de PDF do extrato |
-| **python-dateutil** | 2.9 | Cálculo de meses anteriores no analytics |
-| **Pillow** | 12.1 | Upload e processamento de imagens |
+| **Django** | 6.0 | Framework MVT |
+| **WeasyPrint** | 68.1 | Geração de PDFs |
+| **Pillow** | 12.1 | Upload/processamento de imagens |
+| **python-dateutil** | 2.9 | Cálculo de datas para analytics |
 | **SQLite** | built-in | Banco de dados (desenvolvimento) |
 
-### Frontend
-| Tecnologia | Finalidade |
+### 🎨 Frontend
+| Tecnologia | Uso |
 |---|---|
 | **Tailwind CSS** (CDN) | Estilização utilitária |
-| **Chart.js** (CDN) | Gráficos de analytics (barras, linhas) |
-| **Vanilla JavaScript** | Interações, fetch API para sugestão de categoria via IA |
+| **Chart.js** (CDN) | Gráficos de analytics |
+| **Vanilla JavaScript** | Fetch API, sugestão de categoria |
 | **HTML5 / SVG** | Estrutura e ícones inline |
-
----
-
-## 🧩 Funcionalidades
-
-### 🏠 Dashboard (Home)
-- Saldo total consolidado das contas cadastradas
-- Totais de entradas e saídas do mês atual
-- Gauge visual de equilíbrio financeiro (essenciais vs não essenciais)
-- Alertas automáticos de orçamento ultrapassado por categoria
-
-### 📊 Analytics (Dashboard)
-- Gráfico de barras: gastos por categoria no mês atual
-- Gráfico de linha: evolução mensal de entradas/saídas (últimos 6 meses)
-- Gráfico de área: evolução do saldo patrimonial acumulado
-
-### 📥 Extrato
-- Listagem de transações filtradas por conta e categoria
-- Exportação de extrato mensal em **PDF** via WeasyPrint
-
-### ➕ Novo Valor
-- Registro de entradas e saídas com conta, categoria, data e descrição
-- **Sugestão automática de categoria via IA** baseada em palavras-chave da descrição (regras definidas em `perfil/categoria_rules.py`)
-- Alerta imediato ao ultrapassar o orçamento de uma categoria
-
-### ⚙️ Gerenciar
-- Cadastro de contas bancárias (Nubank, Itaú, Bradesco, etc.) com ícone personalizado
-- Cadastro e gerenciamento de categorias (essencial / não essencial)
-- Saldo total consolidado das contas
-
-### 📋 Contas a Pagar
-- Cadastro de contas mensais recorrentes
-- Agrupamento automático: **vencidas**, **próximas do vencimento** (5 dias) e **restantes**
-- Management command (`processar_recorrencias`) para processar débitos recorrentes automaticamente
-
-### 🎯 Planejamento & Metas
-- Definição de valor de planejamento mensal por categoria
-- Visualização de progresso com barra de status (verde / amarelo / vermelho)
-- Metas financeiras: economizar por mês ou limitar gasto por categoria
 
 ---
 
 ## 🚀 Como Rodar o Projeto
 
-### Pré-requisitos
-- Python 3.11 ou superior
-- `pip` e `venv`
+### ✅ Pré-requisitos
 
-### 1. Clonar o repositório
+- **Python 3.11+** instalado → [python.org](https://www.python.org/downloads/)
+- **pip** (geralmente já incluso com Python)
+- Terminal: PowerShell (Windows) ou Bash (Linux/macOS)
+
+---
+
+### 1️⃣ Clonar o Repositório
+
 ```bash
-git clone https://github.com/seu-usuario/FINCANCE_PSW.git
-cd FINCANCE_PSW
+git clone https://github.com/seu-usuario/FINANCE.git
+cd FINANCE
 ```
 
-### 2. Criar e ativar o ambiente virtual
-```bash
-# Windows
-python -m venv .venv
-.venv\Scripts\activate
+---
 
-# Linux/macOS
+### 2️⃣ Criar e Ativar o Ambiente Virtual
+
+```bash
+# 🪟 Windows (PowerShell)
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+
+# 🐧 Linux / 🍎 macOS
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Instalar dependências
+> ✅ O terminal deve mostrar `(.venv)` no início da linha quando o ambiente estiver ativo.
+
+---
+
+### 3️⃣ Instalar Dependências
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Aplicar as migrações
+> ⚠️ **WeasyPrint no Windows** pode exigir o [GTK Runtime](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer). Veja a [documentação oficial](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#windows).
+
+---
+
+### 4️⃣ Aplicar as Migrações
+
 ```bash
 python manage.py migrate
 ```
 
-### 5. Criar superusuário (opcional, para o admin)
+---
+
+### 5️⃣ Criar Superusuário *(necessário para acessar o sistema)*
+
 ```bash
 python manage.py createsuperuser
 ```
 
-### 6. Rodar o servidor de desenvolvimento
+Siga as instruções no terminal (username, email, senha).
+
+---
+
+### 6️⃣ Rodar o Servidor
+
 ```bash
 python manage.py runserver
 ```
 
-Acesse: [http://localhost:8000](http://localhost:8000)
+Acesse: **[http://localhost:8000](http://localhost:8000)**
 
-> A rota raiz redireciona automaticamente para `/perfil/home/`.
+> 🔁 A rota `/` redireciona automaticamente para `/perfil/home/`.
 
 ---
 
-## 📁 Estrutura de URLs
+### 🔄 Processar Contas Recorrentes *(opcional)*
 
-| URL | App | Descrição |
-|---|---|---|
-| `/perfil/home/` | perfil | Dashboard principal |
-| `/perfil/gerenciar/` | perfil | Gerenciar contas e categorias |
-| `/perfil/dashboard/` | perfil | Analytics com gráficos |
-| `/extrato/novo_valor/` | extrato | Registrar transação |
-| `/extrato/view_extrato/` | extrato | Visualizar extrato |
-| `/extrato/exportar_pdf/` | extrato | Exportar extrato em PDF |
-| `/contas/definir_contas/` | contas | Cadastrar conta mensal |
-| `/contas/ver_contas/` | contas | Ver contas a pagar |
-| `/planejamento/definir_planejamento/` | planejamento | Definir orçamento |
-| `/planejamento/ver_planejamento/` | planejamento | Ver progresso |
-| `/planejamento/metas/` | planejamento | Metas financeiras |
-| `/perfil/api/sugerir_categoria/` | perfil | API de sugestão de categoria (IA) |
-| `/admin/` | Django Admin | Administração |
+Para lançar automaticamente débitos recorrentes no extrato do mês atual:
+
+```bash
+python manage.py processar_recorrencias
+```
+
+---
+
+## 🗺️ Mapa de URLs
+
+| URL | Descrição |
+|-----|-----------|
+| `/perfil/home/` | 🏠 Dashboard principal |
+| `/perfil/gerenciar/` | ⚙️ Gerenciar contas e categorias |
+| `/perfil/dashboard/` | 📊 Analytics com gráficos |
+| `/extrato/novo_valor/` | ➕ Registrar transação |
+| `/extrato/view_extrato/` | 📄 Visualizar extrato |
+| `/extrato/exportar_pdf/` | 📥 Exportar extrato em PDF |
+| `/contas/definir_contas/` | 💳 Cadastrar conta mensal |
+| `/contas/ver_contas/` | 💰 Ver contas a pagar |
+| `/planejamento/definir_planejamento/` | 📝 Definir orçamento por categoria |
+| `/planejamento/ver_planejamento/` | 📈 Ver progresso do planejamento |
+| `/planejamento/metas/` | 🎯 Metas financeiras |
+| `/perfil/api/sugerir_categoria/` | 🤖 API de sugestão de categoria |
+| `/admin/` | 🔧 Django Admin |
 
 ---
 
 ## 🤖 API de Sugestão de Categoria
 
-O endpoint `/perfil/api/sugerir_categoria/?descricao=<texto>` analisa o texto da descrição e retorna uma sugestão de categoria baseada em mapeamento de palavras-chave.
+O endpoint analisa a descrição de uma transação e retorna a categoria sugerida automaticamente.
+
+**Endpoint:** `GET /perfil/api/sugerir_categoria/?descricao=<texto>`
 
 **Exemplo de resposta:**
 ```json
@@ -182,51 +185,79 @@ O endpoint `/perfil/api/sugerir_categoria/?descricao=<texto>` analisa o texto da
 }
 ```
 
-As regras estão definidas em `perfil/categoria_rules.py` e cobrem categorias como Transporte, Alimentação, Moradia, Saúde, Lazer, Educação e Salário.
+> As regras estão em `perfil/categoria_rules.py` e cobrem: **Transporte, Alimentação, Moradia, Saúde, Lazer, Educação e Salário**.
 
 ---
 
-## 🛠️ Management Commands
+## 🏗️ Arquitetura do Projeto
 
-### Processar recorrências
-Cria automaticamente lançamentos no extrato para contas marcadas como recorrentes que ainda não foram pagas no mês atual:
-
-```bash
-python manage.py processar_recorrencias
+```
+FINANCE/
+├── core/               # Settings, URLs raiz, WSGI, middleware
+├── perfil/             # Dashboard, contas bancárias, analytics, API de categoria
+├── extrato/            # Transações (entradas/saídas), exportação PDF
+├── contas/             # Contas a pagar mensais e recorrentes
+├── planejamento/       # Planejamento por categoria e metas financeiras
+├── blog/               # Blog de conteúdo financeiro
+├── templates/
+│   ├── bases/          # Template base com sidebar e header
+│   ├── partials/       # Templates para geração de PDF
+│   └── static/         # CSS globais
+├── media/              # Uploads (ícones das contas bancárias)
+├── svg/                # Ícones SVG inline
+├── manage.py
+└── requirements.txt
 ```
 
 ---
 
-## 📊 Modelos de Dados
+## 🗃️ Modelos de Dados
 
 ```
-Categoria          — categoria, essencial, valor_planejamento
-Conta              — apelido, banco, tipo, valor, icone
-Valores            — valor, categoria, descricao, data, conta, tipo (E/S)
-ContaPagar         — titulo, categoria, descricao, valor, dia_pagamento, recorrente
-ContaPaga          — conta, data_pagamento
-MetaFinanceira     — titulo, tipo, valor, categoria (opcional)
+Categoria         → categoria, essencial (bool), valor_planejamento
+Conta             → apelido, banco, tipo, valor, icone
+Valores           → valor, categoria, descrição, data, conta, tipo (E/S)
+ContaPagar        → título, categoria, valor, dia_pagamento, recorrente (bool)
+ContaPaga         → conta, data_pagamento
+MetaFinanceira    → título, tipo, valor, categoria (opcional)
 ```
 
 ---
 
-## 🗂️ Variáveis de Configuração
+## ⚙️ Variáveis de Configuração
 
 Configure em `core/settings.py`:
 
 | Variável | Padrão | Descrição |
 |---|---|---|
-| `SECRET_KEY` | insecure-key | Chave secreta do Django |
-| `DEBUG` | `True` | Modo debug |
+| `SECRET_KEY` | insecure-key | 🔴 **Alterar em produção** |
+| `DEBUG` | `True` | 🔴 **Definir `False` em produção** |
 | `ALLOWED_HOSTS` | `[]` | Hosts permitidos em produção |
 | `DATABASES` | SQLite | Banco de dados |
 | `MEDIA_ROOT` | `./media` | Diretório de uploads |
-| `STATICFILES_DIRS` | `./templates/static` | Diretório de arquivos estáticos |
 
-> ⚠️ Para produção, altere `SECRET_KEY`, configure `ALLOWED_HOSTS`, defina `DEBUG=False` e use um banco de dados robusto (PostgreSQL recomendado).
+> 🔐 **Para produção:** troque `SECRET_KEY`, configure `ALLOWED_HOSTS`, defina `DEBUG=False` e use **PostgreSQL**.
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+
+| Dashboard | Extrato | Planejamento |
+|:---------:|:-------:|:------------:|
+| <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop" width="260"/> | <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop" width="260"/> | <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=250&fit=crop" width="260"/> |
+
+</div>
 
 ---
 
 ## 📄 Licença
 
-Este projeto foi desenvolvido para fins educacionais e pessoais.
+Este projeto foi desenvolvido para fins **educacionais e pessoais**.
+
+---
+
+<div align="center">
+  <sub>Feito com ❤️ usando Django · Python · Tailwind CSS · Chart.js</sub>
+</div>

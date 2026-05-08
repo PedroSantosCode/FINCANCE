@@ -18,6 +18,7 @@ __pycache__/
 venv/
 .venv/
 env/
+.env
 ENV/
 env.bak/
 venv.bak/
@@ -29,6 +30,7 @@ venv.bak/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+*.sqlite3
 
 # Arquivos de migração gerados (manter os iniciais é opcional)
 # Descomente as linhas abaixo se quiser ignorar todas as migrações
@@ -49,10 +51,11 @@ config/local.py
 # ---------------------------------------------------------------
 # Arquivos de Mídia / Uploads de Usuários
 # ---------------------------------------------------------------
-# Os uploads ficam em /media — não versionar arquivos de usuário,
-# apenas manter a estrutura de diretórios (via .gitkeep)
+# Ignorar maioria dos uploads de usuário, MAS manter os assets padrões do projeto (ex: logotipos, bancos)
 media/*
 !media/.gitkeep
+!media/icones/
+!media/icones/**/*
 
 # ---------------------------------------------------------------
 # Arquivos Estáticos Coletados
@@ -121,3 +124,11 @@ dmypy.json
 *.bak
 *.orig
 *.pid
+
+# ---------------------------------------------------------------
+# Scripts de Debug / Teste (raiz do projeto)
+# ---------------------------------------------------------------
+debug_tags.py
+test_pages.py
+verify_pdf.py
+verify_template.py
