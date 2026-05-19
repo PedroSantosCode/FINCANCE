@@ -35,6 +35,9 @@
 ### 3. Orçamento e Planejamento
 <img src="imgsource/Planning.png" width="100%" alt="Visualização do Planejamento" style="border-radius:8px; margin-bottom: 20px;">
 
+### 4. Blog & News
+<img src="imgsource/BlogNews.png" width="100%" alt="Visualização do Planejamento" style="border-radius:8px; margin-bottom: 20px;">
+
 ---
 
 ## Stack Tecnológica
